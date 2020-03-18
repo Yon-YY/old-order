@@ -1,16 +1,35 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "uni-app"
-			}
-		}
-	],
-	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
-	}
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "外卖点餐"
+      }
+    },
+    {
+      "path": "components/tab/tab",
+      "style": {
+        "usingComponents": {
+          "van-tab": "/wxcomponents/vant/dist/tab/index",
+          "van-tabs": "/wxcomponents/vant/dist/tabs/index"
+        },
+        "navigationBarTitleText": "Tab组件"
+      }
+    },
+    {
+      "path": "components/search/search",
+      "style": {
+        "usingComponents": {
+          "van-search": "/wxcomponents/vant/dist/search/index"
+        },
+        "navigationBarTitleText": "搜索组件"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  }
 }
