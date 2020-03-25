@@ -1,6 +1,6 @@
 import {getDataApi} from "./api";
 
-const url = 'http://192.168.9.47:8081';
+const url = 'http://192.168.9.24:8081';
 // 食堂菜单
 export function canteenTab(params) {
   const path = '/api/u/merchantInfo/selectMerchantByHospitalId';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)

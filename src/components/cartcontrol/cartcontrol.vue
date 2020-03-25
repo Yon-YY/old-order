@@ -1,8 +1,7 @@
 <template>
   <view>
     <!--快餐-->
-    <view class="cartcontrol"
-          v-if="food.dishesType === 1">
+    <view class="cartcontrol" v-if="food.dishMode === 1">
       <view class="cart-decrease" @tap="decreaseCart">
         <text class="cart-icon cart-inner"
               :class="[_food.goodsNum > 0 ? 'cart-decrease-show':'cart-decrease-hide']"></text>
@@ -14,10 +13,10 @@
       <view class="cart-icon cart-add" @tap="touchOnGoods"></view>
     </view>
     <!--套餐-->
-    <view class="cartcontrol"
-          v-else-if="food.dishesType === 2">
-      <text class="good-format-btn" @tap.stop="selectFormat">选规格</text>
-    </view>
+<!--    <view class="cartcontrol"-->
+<!--          v-else-if="food.dishMode === 2">-->
+<!--      <text class="good-format-btn" @tap.stop="selectFormat">选择菜品</text>-->
+<!--    </view>-->
     <!--小球动画-->
     <view class="ball-box" :hidden="hide_good_box"
           :style="[{left: bus_x +'px', top: bus_y +'px'}]">
@@ -32,18 +31,10 @@
 
   export default {
     props: {
-      goods: {
-        type: Array,
-        default: []
-      },
-      goodIndex: {
-        type: Number,
-        default: 0
-      },
-      foodIndex: {
-        type: Number,
-        default: 0
-      },
+      // goods: {
+      //   type: Array,
+      //   default: []
+      // },
       food: {
         type: Object
       }
@@ -86,7 +77,6 @@
             this.setCartAn(false);
             setTimeout(() => {
               this.setCartShow(true);
-              1
             }, 750);
           }
         },
@@ -103,12 +93,17 @@
       }
     },
     computed: {
+      watchGoodsContcat() {
+        let goodsContcat = [...this.getCartGoodsMorning, ...this.getCartGoodsNoon, ...this.getCartGoodsNight];
+        // console.log('goodsContcat', goodsContcat.length);
+        return goodsContcat;
+      },
       _food() {
         switch (this.getTimeSlot) {
           case 1:
             let foodsMorning = {};
             this.getCartGoodsMorning.forEach(morning => {
-              if (morning.goodsId === this.food.goodsId) {
+              if (morning.dishId === this.food.dishId) {
                 foodsMorning = morning;
               }
             });
@@ -117,7 +112,7 @@
           case 2:
             let foodsNoon = {};
             this.getCartGoodsNoon.forEach(noon => {
-              if (noon.goodsId === this.food.goodsId) {
+              if (noon.dishId === this.food.dishId) {
                 foodsNoon = noon;
               }
             });
@@ -126,7 +121,7 @@
           case 3:
             let foodsNight = {};
             this.getCartGoodsNight.forEach(night => {
-              if (night.goodsId === this.food.goodsId) {
+              if (night.dishId === this.food.dishId) {
                 foodsNight = night;
               }
             });
@@ -144,14 +139,16 @@
     methods: {
       // 减
       decreaseCart() {
-        this.reduceGood(this.food.goodsId);
+        this.reduceGood(this.food.dishId);
       },
       // 规格
-      selectFormat() {
-        this.setFormatListDetails(this.goods[this.goodIndex].goodsList[this.foodIndex]);
-        this.setFormatWrapState(false);
-        this.setFormatState(true);
-      },
+      // selectFormat() {
+      //   console.log('套餐：',this.goods)
+      //   // this.setFormatListDetails(this.goods[this.goodIndex].goodsList[this.foodIndex]);
+      //   // this.setFormatListDetails(this.goods);
+      //   this.setFormatWrapState(false);
+      //   this.setFormatState(true);
+      // },
       // 加
       touchOnGoods(e) {
         // 如果good_box正在运动
@@ -190,12 +187,11 @@
             clearInterval(this.timer);
             this.hide_good_box = true;
             let foodItem = {
-              goodsId: this.food.goodsId,
-              goodsCategoryId: this.food.goodsCategoryId,
-              goodsName: this.food.goodsName,
+              dishId: this.food.dishId,
+              dishName: this.food.dishName,
               price: this.food.price,
               img: this.food.img,
-              dishesType: this.food.dishesType,
+              dishMode: this.food.dishMode,
               goodsFormat: this.food.goodsFormat
             }
             this.addGood(foodItem);
@@ -208,13 +204,10 @@
         'setTimeSlot',
         'addGood',
         'reduceGood',
-        'setFormatWrapState',
-        'setFormatState',
         'setCartShow',
         'setCartAn',
         'setShopcartListState',
-        'setShopcartShow',
-        'setFormatListDetails'
+        'setShopcartShow'
       ])
     }
   };

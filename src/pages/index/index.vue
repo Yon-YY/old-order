@@ -1,13 +1,13 @@
 <template>
   <view class="index-wrap">
     <view class="header-content-wrap" :hidden="!tabBarState">
-      <m-header class="header-main"></m-header>
+      <m-header></m-header>
       <goods></goods>
     </view>
     <!--订单-->
-    <view :hidden="tabBarState">
-      <order-list class="order-main"></order-list>
-    </view>
+    <!--    <view :hidden="tabBarState">-->
+    <!--      <order-list class="order-main"></order-list>-->
+    <!--    </view>-->
     <!--底部Tab-->
     <view class="tab-bar-wrapper">
       <tab-bar @tabBarIndex="tabBarIndex"></tab-bar>
@@ -17,13 +17,13 @@
       <format-dialog></format-dialog>
     </view>
     <!--Loading组件-->
-    <view class="loading-wrap" :hidden="getLoadingState">
-      <loading-layer></loading-layer>
-    </view>
+<!--    <view class="loading-wrap" :hidden="getLoadingState">-->
+<!--      <loading-layer></loading-layer>-->
+<!--    </view>-->
   </view>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
   import Header from 'pages/header/header';
   import Goods from 'components/goods/goods';
   import LoadingLayer from 'components/loading/loading';
@@ -67,9 +67,6 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" type="text/stylus">
-  .header-wrapper {
-    height: 324rpx;
-  }
   .tab-bar-wrapper {
     position: fixed;
     left: 0;

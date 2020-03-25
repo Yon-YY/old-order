@@ -52,7 +52,7 @@
   .shopcart-type-wrap {
     .food-type {
       padding: 30rpx 40rpx 20rpx 40rpx;
-      font-size: $font-size-medium;
+      font-size: $font-size24;
       color: $color-text;
       border-bottom: 1px solid rgba(245, 247, 250, .9);
       background: rgba(245, 247, 250, .5);
@@ -74,7 +74,7 @@
       .good-synopsis {
         position: relative;
         flex: 1;
-        font-size: $font-size-large-xx;
+        font-size: $font-size32;
         .good-name {
           margin: 16rpx 0 10rpx 0;
           height: 32rpx;

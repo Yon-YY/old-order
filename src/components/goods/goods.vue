@@ -4,10 +4,10 @@
     <!--左侧菜单-->
     <scroll-view class="menu-list-wrapper" :show-scrollbar="showScrollbar"
                  :scroll-y="scrolly" :scroll-with-animation="scrollAnimation">
-      <view class="menu-item" v-for="(menu, index) in goods" :key="index"
+      <view class="menu-item" v-for="(menu, index) in menusLeft" :key="index"
             :class="[currentMenuIndex === index ? 'current':'']"
             @tap="selectMenu(menu, index)">
-        <text class="menu-text">{{menu.goodsCategoryName}}</text>
+        <text class="menu-text">{{menu.dishClassName}}</text>
       </view>
     </scroll-view>
     <!--右侧商品-->
@@ -15,31 +15,9 @@
                  :scroll-into-view="currentGoodId"
                  :show-scrollbar="showScrollbar"
                  :scroll-with-animation="scrollAnimation"
-                 :scroll-y="scrolly" @scroll="scrollGoods">
-      <view v-for="(good, id) in goods" :key="good.goodsCategoryId"
-            class="goods-list">
-        <!--点击左侧菜单，右侧滚动到相应类别（必须绑定 id 否则无效）-->
-        <text class="good-title" :id="`menu${good.goodsCategoryId}`">
-          {{good.goodsCategoryName}}
-        </text>
-        <view v-for="(food, index) in good.goodsList" class="good-item"
-              :key="index">
-          <view class="good-img">
-            <image class="img" :src="food.img"></image>
-          </view>
-          <view class="good-synopsis">
-            <text class="good-name">{{food.goodsName}}</text>
-            <text class="good-desc">{{food.goodsDescribe}}</text>
-            <text class="good-price">￥{{food.price}}</text>
-            <view class="cartcontrol-wrapper">
-              <cartcontrol :goods="goods"
-                           :goodIndex="id"
-                           :foodIndex="index"
-                           :food="food">
-              </cartcontrol>
-            </view>
-          </view>
-        </view>
+                 :scroll-y="scrolly">
+      <view class="goods-list">
+        <goods-type :goodType="mergeDishList"></goods-type>
       </view>
       <null v-if="goods.length === 0 || goods === null" nullText="暂无菜品"></null>
     </scroll-view>
@@ -54,18 +32,19 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import Cartcontrol from 'components/cartcontrol/cartcontrol';
+  import GoodsType from '../goods-type/goods-type';
   import Shopcart from '../shopcart/shopcart';
   import {mapGetters, mapActions} from 'vuex';
-  import {goodsList} from 'js/goodsList';
+  import {menuLeft} from 'js/menuLeft';
+  import {goodRight} from 'js/goodRight';
+  import {dishList} from 'js/dishList';
 
   export default {
     data() {
       return {
-        goods: [],  // 数据
-        goodsListHeight: 0, //右侧菜品列表内容总高度
-        heightArrs: [], // 列表分类距离屏幕 scrollTop
-        lastActive: 0,  // 标志位
+        menusLeft: [],  // 左侧菜单
+        goodsList: [],  // 商品列列数据
+        mergeDishList:[], //菜品、套餐接口数据合并
         currentMenuIndex: 0, //左侧菜单
         currentGoodId: '',  //右侧菜品 id
         showScrollbar: true,  //是否显示滚动条
@@ -91,34 +70,10 @@
       ])
     },
     methods: {
-      // 点击左侧菜单
       selectMenu(item, index) {
         setTimeout(() => {
-          this.currentGoodId = `menu${item.goodsCategoryId}`;
           this.currentMenuIndex = index;
         }, 100);
-      },
-      // 滚动右侧商品列表
-      scrollGoods(e) {
-        const scrollTop = e.detail.scrollTop;
-        const scorllArr = this.heightArrs;
-        if (scrollTop >= scorllArr[scorllArr.length - 1] - (this.goodsListHeight / 2)) {
-          return;
-        } else {
-          for (let i = 0; i < scorllArr.length; i++) {
-            if (scrollTop >= 0 && scrollTop < scorllArr[0]) {
-              if (0 != this.lastActive) {
-                this.currentMenuIndex = 0;
-                this.lastActive = 0;
-              }
-            } else if (scrollTop >= scorllArr[i - 1] && scrollTop < scorllArr[i]) {
-              if (i != this.lastActive) {
-                this.currentMenuIndex = i;
-                this.lastActive = i;
-              }
-            }
-          }
-        }
       },
       toggleShopCart() {
         this.setShopcartListState(false);
@@ -132,36 +87,13 @@
         'setShopcartShow'
       ])
     },
-    mounted() {
-      const _self = this;
-      setTimeout(() => {
-        uni.getSystemInfo({
-          success: (res) => {
-            let windowHeight = (res.windowHeight * (750 / res.windowWidth)); //将高度乘以换算后设备的rpx与px的比例 最后获得转化后得rpx单位的窗口高度
-            // 头部内容高度324  底部高度 186(购物车高度 88   底部Bar高度 98)
-            _self.goodsListHeight = windowHeight - (324 + 186);
-          }
-        });
-        let heightArr = [];
-        let h = 0;
-        //创建节点选择器
-        const goodList = uni.createSelectorQuery().in(this);
-        //选择id
-        goodList.selectAll('.goods-list').boundingClientRect(res => {
-          res.forEach(item => {
-            h += item.height;
-            heightArr.push(h);
-          });
-          _self.heightArrs = heightArr;
-        }).exec();
-      }, 2000);
-    },
     created() {
-      console.log(goodsList.data);
-      this.goods = goodsList.data;
+      this.menusLeft = menuLeft.data;
+      this.goodsList = goodRight.data;
+      this.mergeDishList = [this.goodsList, dishList.data.dishPackages];
     },
     components: {
-      Cartcontrol,
+      GoodsType,
       Shopcart
     }
   };
@@ -171,17 +103,18 @@
   .goods-wraper {
     position: absolute;
     display: flex;
+    padding-top: 30rpx;
     width: 100%;
     background: $color-button-text;
     overflow: hidden;
   }
   /*购物车隐藏时商品列表的高度*/
   .goods-hide-cart {
-    height: calc(100% - 422rpx);
+    height: calc(100% - 186rpx);
   }
   /*购物车显示时商品列表的高度*/
   .goods-show-cart {
-    height: calc(100% - 510rpx);
+    height: calc(100% - 275rpx);
   }
   .menu-list-wrapper {
     flex: 0 0 160rpx;
@@ -231,14 +164,14 @@
     font-weight: $font-weight-b;
     color: $color-sub-theme;
   }
-  .good-item {
+  /*.good-item {
     position: relative;
     display: flex;
     padding-bottom 20rpx;
     margin: 0 24rpx 20rpx 24rpx;
   }
   .good-item:last-child {
-    margin-bottom: 0;
+    margin-bottom: 60rpx;
   }
   .good-img {
     flex: 0 0 160rpx;
@@ -280,7 +213,7 @@
     position: absolute;
     right: 6rpx;
     bottom: 6rpx
-  }
+  }*/
   .shopacart-box {
     position: fixed;
     left: 0;

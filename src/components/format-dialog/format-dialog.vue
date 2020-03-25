@@ -3,32 +3,32 @@
     <viwe class="format-dialog-content vertical-center"
           :class="[getFormatState === false ? 'close-an' : 'open-an']">
       <text class="format-dialog-title">
-        {{getFormatListDetails.goodsName}}
+        {{getDishIndex[1].dishPackageName}}
       </text>
       <!--套餐菜品一-->
       <view class="foods-list-main">
-        <text class="foods-list-title">{{formatList[0].typeName}}：</text>
+        <text class="foods-list-title">{{foodTypeName[0]}}：</text>
         <view class="foods-list-box">
           <view class="checkbox-item-wrap">
             <text class="checkbox-item"
-                  v-for="(list, index) in formatList[0].goodsList"
+                  v-for="(list, index) in goodsGroup[0]"
                   @tap="checkBoxOne(index)"
                   :class="{'checkbox-item-curr' : currArrOne.includes(index)}"
-                  :key="index">{{list.goodsName}}
+                  :key="index">{{list}}
             </text>
           </view>
         </view>
       </view>
       <!--套餐菜品二-->
       <view class="foods-list-main">
-        <text class="foods-list-title">{{formatList[1].typeName}}：</text>
+        <text class="foods-list-title">{{foodTypeName[1]}}：</text>
         <view class="foods-list-box">
           <view class="checkbox-item-wrap">
             <text class="checkbox-item"
-                  v-for="(list, index) in formatList[1].goodsList"
+                  v-for="(list, index) in goodsGroup[1]"
                   @tap="checkBoxTwo(index)"
                   :class="{'checkbox-item-curr': currArrTwo.includes(index)}"
-                  :key="index">{{list.goodsName}}
+                  :key="index">{{list}}
             </text>
           </view>
         </view>
@@ -39,7 +39,7 @@
           总价
           <text class="shop-price shop-price-icon">￥</text>
           <text class="shop-price shop-price-num">
-            {{getFormatListDetails.price}}
+            {{getDishIndex[1].dishPackagePrice}}
           </text>
         </view>
         <view class="shop-bottom-right" @tap="joinShopcart">加入购物车</view>
@@ -59,7 +59,11 @@
   export default {
     data() {
       return {
-        formatList: [],
+        // mealList: [], // 荤菜列表
+        // vageList: [], // 素菜列表
+        dishIndex: [], // 套餐数据
+        foodTypeName: ['荤菜', '素菜'],
+        // formatList: [],
         currArrOne: [],
         currArrTwo: []
       };
@@ -71,7 +75,7 @@
           this.currArrOne = this.currArrOne.filter(item => item !== index);
         } else {
           if (this.currArrOne.length >= this._mealMaxNumber) {
-            showToast('none', `${this.formatList[0].typeName}最多只能选${this._mealMaxNumber}个菜品`, 2000);
+            showToast('none', `${this.foodTypeName[0]}最多只能选${this._mealMaxNumber}个菜品`, 2000);
             return;
           } else {
             this.currArrOne.push(index);
@@ -84,7 +88,7 @@
           this.currArrTwo = this.currArrTwo.filter(item => item !== index);
         } else {
           if (this.currArrTwo.length >= this._vageMaxNumber) {
-            showToast('none', `${this.formatList[1].typeName}最多只能选${this._vageMaxNumber}个菜品`, 2000);
+            showToast('none', `${this.foodTypeName[1]}最多只能选${this._vageMaxNumber}个菜品`, 2000);
             return;
           } else {
             this.currArrTwo.push(index);
@@ -118,10 +122,13 @@
       closeformatWrap() {
         setTimeout(() => {
           this.setFormatWrapState(true);
+          this.currArrOne = [];
+          this.currArrTwo = [];
         }, 510);
         this.setFormatState(false);
       },
       ...mapActions([
+        'getGoodsGroup',
         'addGood',
         'setFormatWrapState',
         'setFormatState',
@@ -132,57 +139,74 @@
     created() {
       this.formatList = foodsList.data;
     },
-    computed: {
+    computed: {// 荤素菜归类
+      goodsGroup() {
+        let mealList = [];
+        let vageList = [];
+        if (this.getFormatListDetails[0]) {
+          this.getFormatListDetails[0].forEach(m => {
+            if (m.meatOrVegetable === 1) { // 荤菜
+              mealList.push(m.dishName);
+            } else {
+              vageList.push(m.dishName);
+            }
+          });
+        }
+        // console.log('数组', [mealList, vageList]);
+        // console.log(this.getDishIndex);
+        return [mealList, vageList];
+      },
       // 选中的菜品
       selectFoodsArr() {
         let setMeal = {};
         let selectArr = [];
         let mealArr = this.currArrOne;
         let vageArr = this.currArrTwo;
+        // console.log(mealArr);
         // 荤菜
-        mealArr.forEach(m => {
-          let mealNum = this.formatList[0].goodsList[m];
-          selectArr.push(mealNum);
-        });
-        // 素菜
-        vageArr.forEach(v => {
-          let mealNum = this.formatList[1].goodsList[v];
-          selectArr.push(mealNum);
-        });
-        // return selectArr;
+        // mealArr.forEach(m => {
+        //   let mealNum = this.getFormatListDetails[0].goodsList[m];
+        //   selectArr.push(mealNum);
+        // });
+        // // 素菜
+        // vageArr.forEach(v => {
+        //   let mealNum = this.getFormatListDetails[0].goodsList[v];
+        //   selectArr.push(mealNum);
+        // });
+
         // 套餐菜品合并入购物车数据
-        setMeal = Object.assign({}, {goodsFormat: selectArr}, {
-          goodsId: this.getFormatListDetails.goodsId,
-          goodsCategoryId: this.getFormatListDetails.goodsCategoryId,
-          goodsName: this.getFormatListDetails.goodsName,
-          price: this.getFormatListDetails.price,
-          img: this.getFormatListDetails.img,
-          dishesType: this.getFormatListDetails.dishesType
-        });
+        // setMeal = Object.assign({}, {goodsFormat: selectArr}, {
+        //   dishId: this.getFormatListDetails.dishId,
+        //   periodTimeClassId: this.getFormatListDetails.periodTimeClassId,
+        //   dishName: this.getFormatListDetails.dishName,
+        //   price: this.getFormatListDetails.price,
+        //   img: this.getFormatListDetails.img,
+        //   dishMode: this.getFormatListDetails.dishMode
+        // });
         return setMeal;
       },
       // 荤菜可选上限数量
       _mealMaxNumber() {
-        if (this.getFormatListDetails) {
-          return this.getFormatListDetails.mealNum;
+        if (this.getFormatListDetails[1]) {
+          return this.getFormatListDetails[1][this.getDishIndex[0]].meatAmount;
         }
       },
       // 素菜可选上限数量
       _vageMaxNumber() {
-        if (this.getFormatListDetails) {
-          return this.getFormatListDetails.vageNum;
+        if (this.getFormatListDetails[1]) {
+          return this.getFormatListDetails[1][this.getDishIndex[0]].vegetableAmount;
         }
       },
       ...mapGetters([
         'getFormatState',
-        'getFormatListDetails'
+        'getFormatListDetails',
+        'getDishIndex'
       ])
     }
   };
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" type="text/stylus" scoped>
-  @import "../../common/stylus/variable.styl";
   .format-dialog {
     position: relative;
     width: 100%;
@@ -191,11 +215,11 @@
       margin-top: -70rpx;
       width: 650rpx;
       height: 888rpx;
-      background: $color-button-text;
       border-radius: 8rpx;
+      background: $color-button-text;
       .format-dialog-title {
         margin: 32rpx 0 36rpx 40rpx;
-        font-style: $font-size-large-xxx;
+        font-size: $font-size36;
         font-weight: $font-weight-b;
         color: $color-theme-b;
       }
@@ -205,7 +229,7 @@
         .foods-list-title {
           margin-bottom: 16rpx;
           color: $color-theme;
-          font-size: $font-size-medium;
+          font-size: $font-size24;
         }
         .foods-list-box {
           width: 102%;
@@ -222,7 +246,7 @@
             padding: 15rpx 26rpx;
             margin: 0 25rpx 26rpx 0;
             text-align: center;
-            font-size: $font-size-small;
+            font-size: $font-size22;
             color: $color-text;
             white-space: nowrap;
             border-radius: 8rpx;
@@ -246,15 +270,15 @@
           display: flex;
           align-items: center;
           color: $color-text;
-          font-size: $font-size-medium;
+          font-size: $font-size24;
           .shop-price {
             color: $color-number-text;
-            font-size: $font-size-large-xx;
+            font-size: $font-size32;
             font-weight: $font-weight-b;
           }
           .shop-price-icon {
             margin-top: 10rpx;
-            font-size: $font-size-small-s;
+            font-size: $font-size20;
           }
         }
         .shop-bottom-right {
@@ -263,7 +287,7 @@
           line-height: 56rpx;
           text-align: center;
           color: $color-button-text;
-          font-size: $font-size-medium;
+          font-size: $font-size24;
           background: $color-background-button;
           border-radius: 28rpx;
         }

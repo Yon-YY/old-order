@@ -11,6 +11,7 @@ export default new Vuex.Store({
     searchListAn: false, // 搜索结果列表动画
     merchantIdStr: '', // 商家 id
     timeSlot: 1, // 早餐：1、中餐：2、晚餐：3（默认早餐：1)
+    dishIndex: [], // 套餐index
     timeSlotActive: 0, // 选中餐点状态样式
     cartGoodsMorning: [],  // 购物车早餐的菜品
     cartGoodsNoon: [],  // 购物车中餐的菜品
@@ -43,6 +44,9 @@ export default new Vuex.Store({
     SET_TIME_SLOT(state, timeSlot) {
       state.timeSlot = timeSlot;
     },
+    SET_DISH_INDEX(state, dishIndex) {
+      state.dishIndex = dishIndex;
+    },
     SET_TIME_SLOT_ACTIVE(state, timeSlotActive) {
       state.timeSlotActive = timeSlotActive;
     },
@@ -55,13 +59,13 @@ export default new Vuex.Store({
     SET_CART_GOODS_NIGHT(state, cartGoodsNight) {
       state.cartGoodsNight = cartGoodsNight;
     },
-    ADD_GOOD(state, {goodsId, goodsCategoryId, goodsName, price, img, dishesType, goodsFormat = []}) {
+    ADD_GOOD(state, {dishId, dishName, price, img, dishMode, goodsFormat = []}) {
       // console.log('vuex', state.timeSlot);
       switch (state.timeSlot) {
         case 1:
           state.timeSlotActive = 0;
           let isHasMorning = state.cartGoodsMorning.some(food => {
-            if (food.goodsId === goodsId) {
+            if (food.dishId === dishId) {
               food.goodsNum++;
               return true;
             } else {
@@ -70,12 +74,11 @@ export default new Vuex.Store({
           });
           if (!isHasMorning) {
             state.cartGoodsMorning.push({
-              goodsId,
-              goodsCategoryId,
-              goodsName,
+              dishId,
+              dishName,
               price,
               img,
-              dishesType,
+              dishMode,
               goodsFormat,
               goodsNum: 1,
               timeOfDay: 1
@@ -85,7 +88,7 @@ export default new Vuex.Store({
         case 2:
           state.timeSlotActive = 1;
           let isHasNoon = state.cartGoodsNoon.some(food => {
-            if (food.goodsId === goodsId) {
+            if (food.dishId === dishId) {
               food.goodsNum++;
               return true;
             } else {
@@ -94,12 +97,11 @@ export default new Vuex.Store({
           });
           if (!isHasNoon) {
             state.cartGoodsNoon.push({
-              goodsId,
-              goodsCategoryId,
-              goodsName,
+              dishId,
+              dishName,
               price,
               img,
-              dishesType,
+              dishMode,
               goodsFormat,
               goodsNum: 1,
               timeOfDay: 2
@@ -109,7 +111,7 @@ export default new Vuex.Store({
         case 3:
           state.timeSlotActive = 2;
           let isHasNight = state.cartGoodsNight.some(food => {
-            if (food.goodsId === goodsId) {
+            if (food.dishId === dishId) {
               food.goodsNum++;
               return true;
             } else {
@@ -118,12 +120,11 @@ export default new Vuex.Store({
           });
           if (!isHasNight) {
             state.cartGoodsNight.push({
-              goodsId,
-              goodsCategoryId,
-              goodsName,
+              dishId,
+              dishName,
               price,
               img,
-              dishesType,
+              dishMode,
               goodsFormat,
               goodsNum: 1,
               timeOfDay: 3
@@ -132,12 +133,12 @@ export default new Vuex.Store({
           break;
       }
     },
-    REDUCE_GOOD(state, goodsId) {
+    REDUCE_GOOD(state, dishId) {
       switch (state.timeSlot) {
         case 1:
           state.timeSlotActive = 0;
           state.cartGoodsMorning.forEach((food, index) => {
-            if (food.goodsId === goodsId) {
+            if (food.dishId === dishId) {
               food.goodsNum--;
               if (food.goodsNum === 0) {
                 // 定时器作用：为减按钮留出动画时间
@@ -152,7 +153,7 @@ export default new Vuex.Store({
         case 2:
           state.timeSlotActive = 1;
           state.cartGoodsNoon.forEach((food, index) => {
-            if (food.goodsId === goodsId) {
+            if (food.dishId === dishId) {
               food.goodsNum--;
               if (food.goodsNum === 0) {
                 // 定时器作用：为减按钮留出动画时间
@@ -167,7 +168,7 @@ export default new Vuex.Store({
         case 3:
           state.timeSlotActive = 2;
           state.cartGoodsNight.forEach((food, index) => {
-            if (food.goodsId === goodsId) {
+            if (food.dishId === dishId) {
               food.goodsNum--;
               if (food.goodsNum === 0) {
                 // 定时器作用：为减按钮留出动画时间
@@ -210,6 +211,7 @@ export default new Vuex.Store({
     getSearchListAn: state => state.searchListAn,
     getMerchantIdStr: state => state.merchantIdStr,
     getTimeSlot: state => state.timeSlot,
+    getDishIndex: state => state.dishIndex,
     getTimeSlotActive: state => state.timeSlotActive,
     getCartGoodsMorning: state => state.cartGoodsMorning,
     getCartGoodsNoon: state => state.cartGoodsNoon,
@@ -248,6 +250,9 @@ export default new Vuex.Store({
     setTimeSlot({commit}, timeSlot) {
       commit('SET_TIME_SLOT', timeSlot);
     },
+    setDishIndex({commit}, dishIndex) {
+      commit('SET_DISH_INDEX', dishIndex);
+    },
     setTimeSlotActive({commit}, timeSlotActive) {
       commit('SET_TIME_SLOT_ACTIVE', timeSlotActive);
     },
@@ -263,8 +268,8 @@ export default new Vuex.Store({
     addGood({commit}, good) {
       commit('ADD_GOOD', good);
     },
-    reduceGood({commit}, goodsId) {
-      commit('REDUCE_GOOD', goodsId);
+    reduceGood({commit}, dishId) {
+      commit('REDUCE_GOOD', dishId);
     },
     setFormatWrapState({commit}, formatWrapState) {
       commit('SET_FORMAT_WRAP_STATE', formatWrapState);

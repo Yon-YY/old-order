@@ -32,18 +32,17 @@
       // 减
       decreaseCartGoods() {
         this.setTimeSlot(this.shopcartType);
-        this.reduceGood(this.good.goodsId);
+        this.reduceGood(this.good.dishId);
       },
       // 加
       addCartGoods() {
         this.setTimeSlot(this.shopcartType);
         let foodItem = {
-          goodsId: this.good.goodsId,
-          goodsCategoryId: this.good.goodsCategoryId,
-          goodsName: this.good.goodsName,
+          dishId: this.good.dishId,
+          dishName: this.good.dishName,
           price: this.good.price,
           img: this.good.img,
-          dishesType: this.good.dishesType,
+          dishMode: this.good.dishMode,
           goodsFormat: this.good.goodsFormat
         }
         this.addGood(foodItem);
@@ -67,7 +66,7 @@
       text-align: center;
       border-radius: 23px;
       color: $color-button-text;
-      font-size: $font-size-small;
+      font-size: $font-size22;
       background-color: $color-background-button;
     }
     animation: cartWrapShow .8s ease .8s both;
@@ -97,7 +96,7 @@
       width: 44rpx;
       text-align: center;
       opacity: 0;
-      font-size: $font-size-large-xxx;
+      font-size: $font-size36;
       color: $color-highlight-background;
     }
     .cart-num-show {

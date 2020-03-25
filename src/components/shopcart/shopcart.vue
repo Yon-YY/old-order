@@ -87,7 +87,6 @@
       },
       watchGoodsContcat() {
         let goodsContcat = [...this.getCartGoodsMorning, ...this.getCartGoodsNoon, ...this.getCartGoodsNight];
-        // console.log('早', this.getCartGoodsMorning);
         // console.log('中', this.getCartGoodsNoon);
         // console.log('晚', this.getCartGoodsNight);
         return goodsContcat;
@@ -238,7 +237,7 @@
       line-height 32rpx;
       text-align: center;
       border-radius: 50%;
-      font-size: $font-size-medium;
+      font-size: $font-size24;
       color: $color-button-text;
       background: $color-circular-background;
     }
@@ -246,7 +245,7 @@
       display: inline-block;
       vertical-align: top;
       margin: 30rpx 0 0 40rpx;
-      font-size: $font-size-large-xxx;
+      font-size: $font-size36;
       font-weight: $font-weight-b;
       box-sizing: border-box;
       &.enough {
@@ -261,7 +260,7 @@
       height: 88rpx;
       line-height: 88rpx;
       text-align: center;
-      font-size: $font-size-medium-x;
+      font-size: $font-size26;
       font-weight: $font-weight-b;
       &.not-enough {
         background: $color-theme;
@@ -285,7 +284,7 @@
         padding: 0 40rpx;
         height: 95rpx;
         line-height: 95rpx;
-        font-size: $font-size-medium;
+        font-size: $font-size24;
         border-bottom: 1px solid #E8E9EC;
         .title {
           color: $color-input-placeholder;
@@ -323,7 +322,7 @@
         .good-synopsis {
           position: relative;
           flex: 1;
-          font-size: $font-size-large-xx;
+          font-size: $font-size-large32;
           .good-name {
             margin: 16rpx 0 10rpx 0;
             height: 32rpx;
