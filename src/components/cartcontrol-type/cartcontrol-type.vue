@@ -1,7 +1,7 @@
 <template>
   <view>
     <!--购物车菜品-->
-    <view class="cartcontrol">
+    <view class="cartcontrol" v-if="good.dishMode === 1">
       <view class="cart-decrease" @tap="decreaseCartGoods">
         <text class="cart-icon cart-inner"
               :class="[good.goodsNum > 0 ? 'cart-decrease-show':'cart-decrease-hide']"></text>
@@ -12,6 +12,7 @@
       </text>
       <view class="cart-icon cart-add" @tap="addCartGoods"></view>
     </view>
+    <view class="dish-remove" v-else-if="good.dishMode === 2" @tap="decreaseCartGoods">移 除</view>
   </view>
 </template>
 
@@ -28,6 +29,9 @@
         default: 1
       }
     },
+    // created() {
+    //   console.log('打印', this.good);
+    // },
     methods: {
       // 减
       decreaseCartGoods() {
@@ -47,6 +51,8 @@
         }
         this.addGood(foodItem);
       },
+      // 移除套餐
+      dishRemove(){},
       ...mapActions([
         'setTimeSlot',
         'addGood',
@@ -57,7 +63,6 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" type="text/stylus">
-  @import "../../common/stylus/variable.styl";
   .cartcontrol {
     .good-format-btn {
       width: 104rpx;
@@ -112,6 +117,16 @@
       background: url('../../static/img/add-button.png') no-repeat;
       background-size: cover;
     }
+  }
+  .dish-remove {
+    width: 90rpx;
+    height: 42rpx;
+    line-height: 44rpx;
+    text-align: center;
+    border-radius: 23px;
+    color: $color-button-text;
+    font-size: $font-size22;
+    background-color: $color-input-placeholder;
   }
   .ball-box {
     width: 32rpx;

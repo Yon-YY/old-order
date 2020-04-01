@@ -62,10 +62,20 @@
     watch: {
       watchGoodsContcat: {
         handler(newVal, oldVal) {
+          // if (newVal.length === 0) {
+          //   // 设置购物车动画
+          //   this.setShopcartListState(true);
+          //   this.setShopcartShow(true);
+          // }
           if (newVal.length === 0) {
             // 设置购物车动画
             this.setShopcartListState(true);
             this.setShopcartShow(true);
+            // 定时器作用： 为购物车动画留出执行动画时间
+            this.setCartAn(false);
+            setTimeout(() => {
+              this.setCartShow(true);
+            }, 750);
           }
         },
         deep: true
@@ -87,6 +97,8 @@
       },
       watchGoodsContcat() {
         let goodsContcat = [...this.getCartGoodsMorning, ...this.getCartGoodsNoon, ...this.getCartGoodsNight];
+
+        // console.log('早', this.getCartGoodsMorning);
         // console.log('中', this.getCartGoodsNoon);
         // console.log('晚', this.getCartGoodsNight);
         return goodsContcat;
@@ -172,6 +184,8 @@
         'setCartGoodsMorning',
         'setCartGoodsNoon',
         'setCartGoodsNight',
+        'setCartShow',
+        'setCartAn',
         'setShopcartListState',
         'setShopcartShow'
       ])

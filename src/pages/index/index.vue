@@ -5,9 +5,9 @@
       <goods></goods>
     </view>
     <!--订单-->
-    <!--    <view :hidden="tabBarState">-->
-    <!--      <order-list class="order-main"></order-list>-->
-    <!--    </view>-->
+    <view :hidden="tabBarState">
+      <order-list class="order-main"></order-list>
+    </view>
     <!--底部Tab-->
     <view class="tab-bar-wrapper">
       <tab-bar @tabBarIndex="tabBarIndex"></tab-bar>

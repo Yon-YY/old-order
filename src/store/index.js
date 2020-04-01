@@ -7,9 +7,8 @@ export default new Vuex.Store({
   state: {
     loadingState: false,  // loading组件
     loadingLocal: false, // 局部loading组件
-    searchBoxShow: true, // 搜索结果列表外框
-    searchListAn: false, // 搜索结果列表动画
     merchantIdStr: '', // 商家 id
+    timeSlotData: [],// 早中晚数据
     timeSlot: 1, // 早餐：1、中餐：2、晚餐：3（默认早餐：1)
     dishIndex: [], // 套餐index
     timeSlotActive: 0, // 选中餐点状态样式
@@ -32,14 +31,11 @@ export default new Vuex.Store({
     SET_LOADING_LOCAL(state, loadingLocal) {
       state.loadingLocal = loadingLocal;
     },
-    SET_SEARCH_BOX_SHOW(state, searchBoxShow) {
-      state.searchBoxShow = searchBoxShow;
-    },
-    SET_SEARCH_LIST_AN(state, searchListAn) {
-      state.searchListAn = searchListAn;
-    },
     SET_MERCHANT_ID(state, merchantIdStr) {
       state.merchantIdStr = merchantIdStr;
+    },
+    SET_TIME_SLOT_DATA(state, timeSlotData) {
+      state.timeSlotData = timeSlotData;
     },
     SET_TIME_SLOT(state, timeSlot) {
       state.timeSlot = timeSlot;
@@ -207,9 +203,8 @@ export default new Vuex.Store({
   getters: {
     getLoadingState: state => state.loadingState,
     getLoadingLocal: state => state.loadingLocal,
-    getSearchBoxShow: state => state.searchBoxShow,
-    getSearchListAn: state => state.searchListAn,
     getMerchantIdStr: state => state.merchantIdStr,
+    getTimeSlotData: state => state.timeSlotData,
     getTimeSlot: state => state.timeSlot,
     getDishIndex: state => state.dishIndex,
     getTimeSlotActive: state => state.timeSlotActive,
@@ -238,14 +233,11 @@ export default new Vuex.Store({
     setLoadingLocal({commit}, loadingLocal) {
       commit('SET_LOADING_LOCAL', loadingLocal);
     },
-    setSearchBoxShow({commit}, searchBoxShow) {
-      commit('SET_SEARCH_BOX_SHOW', searchBoxShow);
-    },
-    setSearchListAn({commit}, searchListAn) {
-      commit('SET_SEARCH_LIST_AN', searchListAn);
-    },
     setMerchantIdStr({commit}, merchantIdStr) {
       commit('SET_MERCHANT_ID', merchantIdStr);
+    },
+    setTimeSlotData({commit}, timeSlotData) {
+      commit('SET_TIME_SLOT_DATA', timeSlotData);
     },
     setTimeSlot({commit}, timeSlot) {
       commit('SET_TIME_SLOT', timeSlot);

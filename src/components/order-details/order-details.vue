@@ -1,26 +1,28 @@
 <template>
   <view class="order-details-wrap">
     <view class="desc-state-text">
-      <text class="desc-state" :class="_orderStateText">{{orderReceived.orderStatusText}}
+      <text class="desc-state" :class="_orderStateText">
+        {{orderReceived.orderTypeText}}
       </text>
-      <text class="desc-time" v-if="orderDetails.orderStatus === 5">
+      <text class="desc-time" v-if="orderDetails.orderType === 5">
         预计明天就餐时间点送达
       </text>
     </view>
     <view class="order-details-box">
       <order-foodlist :titleState="titleState"
                       :listItemTitle="listItemTitle"
-                      :foodsList="orderDetails.detailOrderVos"></order-foodlist>
+                      :foodsList="orderDetails.dishList"
+                      :payAmount="orderReceived.payAmount"></order-foodlist>
     </view>
     <view class="order-message-wrap">
       <text class="order-message-title">订单信息</text>
       <view class="massage-item">
         <text class="left-text">订单号码</text>
-        <text class="right-text">{{orderDetails.goodsOrderId}}</text>
+        <text class="right-text">{{orderDetails.orderNo}}</text>
       </view>
       <view class="massage-item">
         <text class="left-text">支付时间</text>
-        <text class="right-text">{{orderDetails.orderPayTime}}</text>
+        <text class="right-text">{{_timeConver}}</text>
       </view>
       <view class="massage-item">
         <text class="left-text">支付方式</text>
@@ -36,7 +38,7 @@
       <view class="desc-item">
         <text class="desc-left">配送地址</text>
         <text class="desc-right">{{orderDetails.orderAddress}}
-          {{orderDetails.orderLinkman}} {{orderDetails.orderLinkmanPhone}}
+          {{orderDetails.userName}} {{orderDetails.phone}}
         </text>
       </view>
       <view class="desc-item">
@@ -49,7 +51,10 @@
 
 <script type="text/ecmascript-6">
   import OrderFoodlist from '../order-foodlist/order-foodlist';
-  import {orderDetailsMsg} from '../../common/js/apiConfig';
+  import {timeStampDate} from 'js/util';
+  import {orderDetailsMsg} from 'js/apiConfig';
+
+  // import {ordersDetails} from 'js/orderDetails';
 
   export default {
     data() {
@@ -63,22 +68,27 @@
     methods: {
       call() {
         uni.makePhoneCall({
-          phoneNumber: this.orderDetails.orderLinkmanPhone
+          phoneNumber: this.orderDetails.phone
         });
       }
     },
     // created() {
-    //   const data = {
-    //     'goodsOrderId': '1020878323795890176'
-    //   }
-    //   orderDetails(data).then(res => {
-    //     this.orderDetails = res.data.data
-    //     // console.log(this.orderDetails);
-    //   });
+    //     const data = {
+    //       'goodsOrderId': '1020878323795890176'
+    //     }
+    //     orderDetails(data).then(res => {
+    //       this.orderDetails = res.data.data
+    //       // console.log(this.orderDetails);
+    //     });
+    //   this.orderDetails = ordersDetails.data;
+    //   console.log('详情', this.orderDetails);
     // },
     computed: {
+      _timeConver(){
+        return timeStampDate(this.orderDetails.orderValidPayTime);
+      },
       _orderStateText() {
-        const state = this.orderDetails.orderStatus;
+        const state = this.orderDetails.orderType;
         if (state === 1 || state === 3 || state === 5 || state === state === 6 || state === 7) {
           return 'desc-state-active';
         } else {
@@ -91,11 +101,11 @@
       this.orderReceived = JSON.parse(decodeURIComponent(params.item));
       if (this.orderReceived) {
         const data = {
-          'goodsOrderId': this.orderReceived.goodsOrderId
+          'deviceMarker': 'KBS1806260769',
+          'orderId': this.orderReceived.orderId
         }
         orderDetailsMsg(data).then(res => {
           this.orderDetails = res.data.data
-          console.log(this.orderDetails);
         });
       }
     },
@@ -115,14 +125,14 @@
       .desc-state {
         padding: 20rpx 0;
         font-weight: $font-weight-b;
-        font-size: $font-size-large-xxx;
+        font-size: $font-size36;
         &.desc-state-active {
           color: $color-background-button;
         }
       }
       .desc-time {
         padding-bottom: 24rpx;
-        font-size: $font-size-medium-x;
+        font-size: $font-size26;
       }
     }
     .order-details-box {
@@ -134,19 +144,19 @@
       padding: 40rpx;
       margin: 24rpx;
       background: $color-button-text;
-      font-size: $font-size-medium-x;
+      font-size: $font-size26;
       border-radius: 16rpx;
       .order-message-title, .desc-message-title {
         margin-bottom: 40rpx;
         color: $color-text;
         font-weight: bold;
-        font-size: $font-size-large-xx;
+        font-size: $font-size32;
       }
       .massage-item, .desc-item {
         display: flex;
         justify-content: space-between;
         margin-bottom: 40rpx;
-        font-size: $font-size-medium;
+        font-size: $font-size24;
         .left-text, .desc-left {
           color: $color-theme;
         }

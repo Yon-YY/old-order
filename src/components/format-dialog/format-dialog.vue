@@ -52,18 +52,14 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import {showToast} from '../../common/js/util';
+  import {showToast} from 'js/util';
   import {mapGetters, mapActions} from 'vuex';
-  import {foodsList} from '../../common/js/foodsList';
 
   export default {
     data() {
       return {
-        // mealList: [], // 荤菜列表
-        // vageList: [], // 素菜列表
         dishIndex: [], // 套餐数据
         foodTypeName: ['荤菜', '素菜'],
-        // formatList: [],
         currArrOne: [],
         currArrTwo: []
       };
@@ -137,7 +133,7 @@
       ])
     },
     created() {
-      this.formatList = foodsList.data;
+
     },
     computed: {// 荤素菜归类
       goodsGroup() {
@@ -158,21 +154,23 @@
       },
       // 选中的菜品
       selectFoodsArr() {
-        let setMeal = {};
+        let setMeal = [];
         let selectArr = [];
         let mealArr = this.currArrOne;
         let vageArr = this.currArrTwo;
-        // console.log(mealArr);
+        // console.log('荤菜',mealArr);
+        // // console.log('素菜',vageArr);
+        // console.log('列表',this.getFormatListDetails);
         // 荤菜
-        // mealArr.forEach(m => {
-        //   let mealNum = this.getFormatListDetails[0].goodsList[m];
-        //   selectArr.push(mealNum);
-        // });
+        mealArr.forEach(m => {
+          let mealNum = this.getFormatListDetails[0][m];
+          selectArr.push(mealNum);
+        });
         // // 素菜
-        // vageArr.forEach(v => {
-        //   let mealNum = this.getFormatListDetails[0].goodsList[v];
-        //   selectArr.push(mealNum);
-        // });
+        vageArr.forEach(v => {
+          let mealNum = this.getFormatListDetails[0][v];
+          selectArr.push(mealNum);
+        });
 
         // 套餐菜品合并入购物车数据
         // setMeal = Object.assign({}, {goodsFormat: selectArr}, {
@@ -183,6 +181,18 @@
         //   img: this.getFormatListDetails.img,
         //   dishMode: this.getFormatListDetails.dishMode
         // });
+        if (this.getDishIndex[1]) {
+          setMeal = Object.assign({}, {goodsFormat: selectArr}, {
+            dishId: this.getDishIndex[1].dishPackageId,
+            dishName: this.getDishIndex[1].dishPackageName,
+            dishDiscrete: this.getDishIndex[1].dishPackageDesc,
+            dishMode: 2,
+            // periodTimeClassId: this.getDishIndex[1].periodTimeClassId,
+            img:'../../static/dish.jpg',
+            price: this.getDishIndex[1].dishPackagePrice
+          });
+          // console.log('套餐', this.getDishIndex[1]);
+        }
         return setMeal;
       },
       // 荤菜可选上限数量

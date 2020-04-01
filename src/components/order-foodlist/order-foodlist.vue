@@ -8,11 +8,11 @@
               :key="index">
           <view class="foods-list">
             <image class="food-img" :src="food.img"></image>
-            <text class="food-name">{{food.goodsName}}</text>
+            <text class="food-name">{{food.dishName}}</text>
           </view>
           <view class="foods-list">
-            <text class="food-num">×{{food.goodsNum}}</text>
-            <text class="food-price">￥{{food.price}}</text>
+            <text class="food-num">×{{food.sumCount}}</text>
+            <text class="food-price" v-if="food.mealMode === 1">￥{{food.price}}</text>
           </view>
         </view>
       </view>
@@ -26,8 +26,9 @@
       <text class="other-amount">￥0</text>
     </view>
     <view class="order-total">
-      共{{totalCount}}件菜品, 小计
-      <text class="total-amount">¥{{totalPrice}}元</text>
+      共{{totalCount}}件菜品
+      , 小计
+      <text class="total-amount">¥{{payAmount}}元</text>
     </view>
   </view>
 </template>
@@ -46,26 +47,17 @@
       listItemTitle: {
         type: String,
         default: ''
+      },
+      payAmount: {
+        type: Number,
+        default: 0
       }
     },
-    data() {
-      return {
-        foodListChild: this.foodsList
-      };
-    },
     computed: {
-      totalPrice() {
-        // console.log(this.foodsList);
-        let total = 0;
-        this.foodsList.forEach(food => {
-          total += food.price * food.goodsNum;
-        });
-        return total;
-      },
       totalCount() {
         let goodsNum = 0;
         this.foodsList.forEach(food => {
-          goodsNum += food.goodsNum;
+          goodsNum += food.sumCount;
         });
         return goodsNum;
       }
@@ -81,7 +73,7 @@
       .list-item-title {
         padding-top: 32rpx;
         margin-bottom: 32rpx;
-        font-size: $font-size-large-xx;
+        font-size: $font-size32;
         color: $color-theme-b;
         font-weight: bold;
       }
@@ -95,7 +87,7 @@
           .foods-list {
             display: flex;
             align-items: center;
-            font-size: $font-size-medium-x;
+            font-size: $font-size26;
             color: $color-theme-b;
             .food-img {
               display: block;
@@ -107,7 +99,7 @@
             }
             .food-num {
               width: 60rpx;
-              font-size: $font-size-medium;
+              font-size: $font-size24;
             }
             .food-price {
               width: 100rpx;
@@ -125,7 +117,7 @@
       margin: 0 40rpx;
       display: flex;
       justify-content: space-between;
-      font-size: $font-size-medium-x;
+      font-size: $font-size26;
       &.border-bottom {
         padding: 40rpx 0;
         border-bottom: 1px $color-background solid;
@@ -144,10 +136,10 @@
       padding: 40rpx 0;
       margin: 0 40rpx;
       color: $color-sub-theme;
-      font-size: $font-size-medium;
+      font-size: $font-size24;
       .total-amount {
         padding-left: 8rpx;
-        font-size: $font-size-large-xx;
+        font-size: $font-size32;
         font-weight: bold;
         color: $color-sub-theme;
       }

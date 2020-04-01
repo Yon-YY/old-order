@@ -7,6 +7,22 @@
       }
     },
     {
+      "path": "pages/submit-order/submit-order",
+      "style": {
+        "usingComponents": {
+          "van-radio": "/wxcomponents/vant/dist/radio/index",
+          "van-radio-group": "/wxcomponents/vant/dist/radio-group/index"
+        },
+        "navigationBarTitleText": "提交订单"
+      }
+    },
+    {
+      "path": "components/order-details/order-details",
+      "style": {
+        "navigationBarTitleText": "订单详情"
+      }
+    },
+    {
       "path": "components/tab/tab",
       "style": {
         "usingComponents": {
@@ -14,15 +30,6 @@
           "van-tabs": "/wxcomponents/vant/dist/tabs/index"
         },
         "navigationBarTitleText": "Tab组件"
-      }
-    },
-    {
-      "path": "components/search/search",
-      "style": {
-        "usingComponents": {
-          "van-search": "/wxcomponents/vant/dist/search/index"
-        },
-        "navigationBarTitleText": "搜索组件"
       }
     }
   ],

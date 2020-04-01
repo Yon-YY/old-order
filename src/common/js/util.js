@@ -1,5 +1,5 @@
 // 验证手机号
-export const validatePhone = (value) => {
+export const validatePhone = value => {
   if (value === '') {
     showToast('none', '手机号码不能为空', 1500);
     return;
@@ -22,6 +22,16 @@ export const showToast = (icon, title, time) => uni.showToast({
   duration: time
 });
 
+// 判断是否为数字，不是强制转换为数字0
+// export const StringZero = num => {
+//   const reg = /^[0-9]+.?[0-9]*$/
+//   if (!reg.test(num)) {
+//     return 0;
+//   } else {
+//     return num;
+//   }
+// }
+
 // 时间戳转日期
 export function timeStampDate(timeStamp, type) {
   const time = new Date(timeStamp);
@@ -43,38 +53,6 @@ export function timeStampDate(timeStamp, type) {
       break;
     default:
       return year + '-' + zeroize(month) + '-' + zeroize(date) + ' ' + zeroize(hours) + ':' + zeroize(minutes) + ':' + zeroize(seconds);
-  }
-}
-
-// 商品列表滚动联动
-/*
-listH：右侧商品列表内容总高度
-topHs：列表分类距离屏幕 scrollTop
-currIndex：左侧菜单当前index
-flag：标志位
-*/
-export function goodsBarIndex(e, listH, topHs) {
-  const scrollTop = e.detail.scrollTop;
-  const scorllArr = topHs;
-  // console.log(scorllArr);
-  if (scrollTop >= scorllArr[scorllArr.length - 1] - (listH / 2)) {
-    return;
-  } else {
-    for (let i = 0; i < scorllArr.length; i++) {
-      if (scrollTop >= 0 && scrollTop < scorllArr[0]) {
-        if (0 != uni.getStorageSync('lastActive')) {
-          uni.setStorageSync('currentMenuIndex', 0);
-          uni.setStorageSync('lastActive', 0);
-        }
-      } else if (scrollTop >= scorllArr[i - 1] && scrollTop < scorllArr[i]) {
-        if (i != uni.getStorageSync('lastActive')) {
-          uni.setStorageSync('currentMenuIndex', i);
-          uni.setStorageSync('lastActive', i);
-
-          // console.log(i);
-        }
-      }
-    }
   }
 }
 

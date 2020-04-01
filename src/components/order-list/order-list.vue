@@ -8,12 +8,12 @@
       <order-item :orderItem="orderItem"></order-item>
       <view class="null-box">
         <null v-if="orderItem.length === 0 || orderItem === null"
-              nullText="暂无菜品"></null>
+              nullText="暂无未支付订单"></null>
       </view>
       <!--Loading组件-->
-      <view class="loading-order-wrap" :hidden="loading">
-        <loading-layer :loadingText="loadingText"></loading-layer>
-      </view>
+      <!--      <view class="loading-order-wrap" :hidden="loading">-->
+      <!--        <loading-layer :loadingText="loadingText"></loading-layer>-->
+      <!--      </view>-->
     </view>
   </view>
 </template>
@@ -24,44 +24,51 @@
   import LoadingLayer from '../loading/loading';
   import Null from '../null/null';
   import {mapGetters} from 'vuex';
-  import {orderList} from '../../common/js/apiConfig';
+  import {orderList} from 'js/apiConfig';
+
+  // import {ordersList} from 'js/orderList';
 
   export default {
     data() {
       return {
         tabTitleText: ['全部订单', '未支付', '已完成'],
         orderItem: [],
-        orderState: 0, // 订单状态
+        orderType: 0, // 订单状态
         loading: false
       };
     },
     methods: {
       tabOrderList(index) {
+        // 滚动回到顶部
+        if (uni.pageScrollTo) {
+          uni.pageScrollTo({
+            scrollTop: 0,
+            duration: 300
+          });
+        }
         if (index === 2) {
-          this.orderState = 8;
+          this._orderList(7);
         } else {
-          this.orderState = index;
+          this._orderList(index);
         }
       },
-      _orderList() {
-        // console.log(this.orderState);
+      _orderList(orderType) {
         this.loading = false;
         const data = {
-          'currentPage': 0,
-          'pageSize': 999,
-          'data': {
-            'hospitalId': '1',
-            'merchantType': 1,
-            'merchantId': this.getMerchantIdStr,
-            'userId': '333333',
-            'orderStatus': this.orderState
-          }
+          'pageSize': 9999,
+          'page': 0,
+          'hospitalId': '8754362990002',
+          'orderType': orderType,
+          'userId': '990423437216927744',
+          'deviceMarker': 'KBS1806260769',
+          'category': 1
         }
         orderList(data).then(res => {
-          if (res.data.code === 200) {
+          if (res.data.code === '200') {
             this.loading = true;
-            this.orderItem = res.data.data.data;
-            // console.log(this.orderItem);
+            this.orderItem = res.data.data;
+          } else {
+            this.orderItem = [];
           }
         });
       }
@@ -71,13 +78,15 @@
         'getMerchantIdStr'
       ])
     },
-    watch: {
-      orderState() {
-        this._orderList();
-      }
-    },
+    // watch: {
+    //   orderType() {
+    //     console.log('未支付',this.orderType);
+    //     this._orderList();
+    //   }
+    // },
     created() {
-      this._orderList();
+      this._orderList(this.orderType);
+      // this.orderItem = ordersList.data;
     },
     components: {
       Tab,

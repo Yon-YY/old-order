@@ -8,7 +8,7 @@
         <image class="img" :src="food.img"></image>
       </view>
       <view class="good-synopsis">
-        <text class="good-name">{{food.goodsName}}</text>
+        <text class="good-name">{{food.dishName}}</text>
         <text class="good-price">￥{{food.price}}</text>
         <view class="cartcontrol-wrapper">
           <cartcontrol-type :good="food" :shopcartType="cartType"></cartcontrol-type>

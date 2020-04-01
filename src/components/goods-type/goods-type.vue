@@ -19,7 +19,7 @@
       <view v-for="(item, index) in goodType[1]" class="good-item"
             :key="item.dishPackageId">
         <view class="good-img">
-          <image class="img" :src="`../../static/dish.jpg`"></image>
+          <image class="img" src="../../static/dish.jpg"></image>
         </view>
         <view class="good-synopsis">
           <text class="good-name">{{item.dishPackageName}}</text>

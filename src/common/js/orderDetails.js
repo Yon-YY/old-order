@@ -1,0 +1,118 @@
+export const ordersDetails = {
+  "code": "200",
+  "msg": "请求成功",
+  "data": {
+    "orderId": "991869125280477184",
+    "orderType": 5,
+    "orderAddress": "妇科病区(14楼)-F051",
+    "userName": "a",
+    "phone": "15919979880",
+    "payAmount": "40",
+    "orderPayType": 2,
+    "remark": "",
+    "orderNo": "KBS012019082616285665122",
+    "orderCreateTime": 1566808137000,
+    "orderValidPayTime": 1566808737000,
+    "amount": null,
+    "finallyTime": "1566808461000",
+    "afterTime": "1566894537000",
+    "reminderTime": null,
+    "dishList": [{
+      "dishId": "895810040790077440",
+      "dishName": "皮蛋瘦肉粥",
+      "img": "http://file.kangdoctor.cn/group1/M01/00/1E/rBK6TlwGNVyAQYPfAAS_Pb8euB0250.png",
+      "sumCount": 1,
+      "price": "8",
+      "dishClassId": null,
+      "mealMode": 1,
+      "meatOrVegetable": 0,
+      "periodTimeClassId": "953395688409632768",
+      "periodTimeClassName": "早餐"
+    },
+      {
+        "dishId": "895804715613638656",
+        "dishName": "玉米/红薯",
+        "img": "http://file.kangdoctor.cn/group1/M01/00/21/rBK6Tlwwhw6Adel2AAJaacRqG6w643.png",
+        "sumCount": 1,
+        "price": "2",
+        "dishClassId": null,
+        "mealMode": 1,
+        "meatOrVegetable": 0,
+        "periodTimeClassId": "953395688409632768",
+        "periodTimeClassName": "早餐"
+      },
+      {
+        "dishId": "903465148990443520",
+        "dishName": "香菇红萝卜炒肉《套餐：2荤1素》",
+        "img": "http://file.kangdoctor.cn/group1/M00/00/21/rBK6TlxpLcOAUB4PAABgNxgLlcc145.jpg",
+        "sumCount": 1,
+        "price": "--",
+        "dishClassId": null,
+        "mealMode": 2,
+        "meatOrVegetable": 1,
+        "periodTimeClassId": "953396128119492608",
+        "periodTimeClassName": "晚餐"
+      },
+      {
+        "dishId": "895814543081820160",
+        "dishName": "酸菜焖猪肉《套餐：2荤1素》",
+        "img": "http://file.kangdoctor.cn/group1/M01/00/1D/rBK6TlwGJnqAJcsZAABJwTVmb0U793.jpg",
+        "sumCount": 1,
+        "price": "--",
+        "dishClassId": null,
+        "mealMode": 2,
+        "meatOrVegetable": 1,
+        "periodTimeClassId": "976982148333760512",
+        "periodTimeClassName": "午餐"
+      },
+      {
+        "dishId": "915780287919902720",
+        "dishName": "青菜《套餐：2荤1素》",
+        "img": "http://file.kangdoctor.cn/group1/M00/00/21/rBK6TlxOyQeAT6TwAAatMx8r3O8952.jpg",
+        "sumCount": 1,
+        "price": "--",
+        "dishClassId": null,
+        "mealMode": 2,
+        "meatOrVegetable": 2,
+        "periodTimeClassId": "953396128119492608",
+        "periodTimeClassName": "晚餐"
+      },
+      {
+        "dishId": "915780287919902720",
+        "dishName": "青菜《套餐：2荤1素》",
+        "img": "http://file.kangdoctor.cn/group1/M00/00/21/rBK6TlxOyQeAT6TwAAatMx8r3O8952.jpg",
+        "sumCount": 1,
+        "price": "--",
+        "dishClassId": null,
+        "mealMode": 2,
+        "meatOrVegetable": 2,
+        "periodTimeClassId": "976982148333760512",
+        "periodTimeClassName": "午餐"
+      },
+      {
+        "dishId": "907085721717002240",
+        "dishName": "蒜台木耳炒肉《套餐：2荤1素》",
+        "img": "http://file.kangdoctor.cn/group1/M01/00/21/rBK6TlwvJ5SAbhxVAAKH2nSsT2Y187.png",
+        "sumCount": 1,
+        "price": "--",
+        "dishClassId": null,
+        "mealMode": 2,
+        "meatOrVegetable": 1,
+        "periodTimeClassId": "953396128119492608",
+        "periodTimeClassName": "晚餐"
+      },
+      {
+        "dishId": "905929802127855616",
+        "dishName": "肉丝南瓜《套餐：2荤1素》",
+        "img": "http://file.kangdoctor.cn/group1/M01/00/20/rBK6Tlwq8wyAIMC_AAJsHuLzJqE647.png",
+        "sumCount": 1,
+        "price": "--",
+        "dishClassId": null,
+        "mealMode": 2,
+        "meatOrVegetable": 1,
+        "periodTimeClassId": "976982148333760512",
+        "periodTimeClassName": "午餐"
+      }
+    ]
+  }
+}

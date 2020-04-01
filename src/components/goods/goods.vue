@@ -35,16 +35,20 @@
   import GoodsType from '../goods-type/goods-type';
   import Shopcart from '../shopcart/shopcart';
   import {mapGetters, mapActions} from 'vuex';
-  import {menuLeft} from 'js/menuLeft';
-  import {goodRight} from 'js/goodRight';
-  import {dishList} from 'js/dishList';
+  import {timeSlot, menuList, foodsList, dishMeal} from 'js/apiConfig';
+
+  // import {menuLeft} from 'js/menuLeft';
+  // import {goodRight} from 'js/goodRight';
+  // import {dishList} from 'js/dishList';
 
   export default {
     data() {
       return {
-        menusLeft: [],  // 左侧菜单
-        goodsList: [],  // 商品列列数据
-        mergeDishList:[], //菜品、套餐接口数据合并
+        timeSlotId: [], // 早中晚 id
+        menusLeft: [],  // 左侧菜单列表数据
+        goodsList: [],  // 商品列表数据
+        dishMealList: [], // 套餐列表数据
+        mergeDishList: [], //菜品、套餐接口数据合并
         currentMenuIndex: 0, //左侧菜单
         currentGoodId: '',  //右侧菜品 id
         showScrollbar: true,  //是否显示滚动条
@@ -53,8 +57,8 @@
       };
     },
     computed: {
-      goodsParams() {
-        return [this.getMerchantIdStr, this.getTimeSlot];
+      foodsParams() {
+        return this.timeSlotId[this.getTimeSlot - 1]; // 早中晚id   左侧菜单id
       },
       ...mapGetters([
         'getLoadingState',
@@ -70,9 +74,19 @@
       ])
     },
     methods: {
+      // 点击左侧菜单
       selectMenu(item, index) {
         setTimeout(() => {
           this.currentMenuIndex = index;
+          this.menuIndex = index;
+          this._foodsRight(item.dishClassId);
+          // 判断如果点击当前菜单不发送请求
+          // if (item.dishClassId === this.menusLeft[index].dishClassId) {
+          //   return;
+          // } else {
+          //   // 缓存菜单 id
+          //   this._foodsRight(item.dishClassId);
+          // }
         }, 100);
       },
       toggleShopCart() {
@@ -81,16 +95,104 @@
           this.setShopcartShow(true);
         }, 510);
       },
+      // 早中晚接口数据
+      _timeSlot() {
+        const timeSlotData = {
+          'hospitalId': '8754362990002',
+          'deviceMarker': 'KBS1806260769',
+          'category': 1,
+          'type': 1
+        }
+        timeSlot(timeSlotData).then(res => {
+          // console.log('早中晚',res.data.data);
+          this.setTimeSlotData(res.data.data);
+          // 缓存早中晚id
+          res.data.data.forEach(item => {
+            this.timeSlotId.push(item.dishClassId);
+          });
+          // // 默认加载早餐
+          // this._menuLeft(this.timeSlotId[0]);
+        }).catch(err => {
+          console.log(`https://segmentfault.com/search?q=${err}`);
+        });
+      },
+      // 左侧菜单列表数据
+      _menuLeft() {
+        const menuLeftData = {
+          'hospitalId': '8754362990002',
+          'category': 1,
+          'dishClassId': this.foodsParams  // 早中晚id
+        }
+        menuList(menuLeftData).then(res => {
+          this.menusLeft = res.data.data;
+          // this.menusLeft.forEach(item =>{
+          //   this.menusId.push(item);
+          // });
+          // console.log('左侧', this.menusLeft[0].dishClassId);
+          // 右侧请求数据
+          // this.menuIndex = this.menusLeft[0].dishClassId;
+          // this._foodsRight(this.timeSlotId[0], this.menusLeft[0].dishClassId);
+          this._foodsRight(this.menusLeft[0].dishClassId);
+        }).catch(err => {
+          console.log(`https://segmentfault.com/search?q=${err}`);
+        });
+      },
+      // 右侧菜品列表接口请求
+      _foodsRight(dishClassId) { // 左侧菜单id
+        const foodsRightData = {
+          'pageSize': 100,
+          'hospitalId': '8754362990002',
+          'periodTimeClassId': this.foodsParams, // 早中晚id
+          'dishClassId': dishClassId, // 左侧菜品id
+          'category': 1,
+          'deviceMarker': 'KBS1806260769'
+        }
+        foodsList(foodsRightData).then(res => {
+          this.goodsList = res.data.data;
+          // console.log('右侧', res.data.data);
+          this._dishMeal();  // 套餐接口
+          // 接口右侧菜品数据、套餐合并数据
+          this.mergeDishList = [this.goodsList, this.dishMealList.dishPackages];
+          // this.menusLeft = res.data.data;
+          // this.setTimeSlotData(res.data.data);
+        }).catch(err => {
+          console.log(`https://segmentfault.com/search?q=${err}`);
+        });
+      },
+      // 套餐接口请求
+      _dishMeal() {
+        const dishMealData = {
+          'hospitalId': '8754362990002',
+          'deviceMarker': 'KBS1806260769',
+          'category': 1
+        }
+        dishMeal(dishMealData).then(res => {
+          // console.log('套餐', res.data.data);
+          this.dishMealList = res.data.data;
+        }).catch(err => {
+          console.log(`https://segmentfault.com/search?q=${err}`);
+        });
+      },
       ...mapActions([
+        'setTimeSlotData',
+        'setMenuLeftData',
         'setLoadingLocal',
         'setShopcartListState',
         'setShopcartShow'
       ])
     },
+    watch: {
+      foodsParams() {
+        this.currentMenuIndex = 0; //左侧菜单样式重置
+        this._menuLeft();
+        // this._foodsRight();
+      }
+    },
     created() {
-      this.menusLeft = menuLeft.data;
-      this.goodsList = goodRight.data;
-      this.mergeDishList = [this.goodsList, dishList.data.dishPackages];
+      this._timeSlot();
+
+      // this.goodsList = goodRight.data;
+      // this.mergeDishList = [this.goodsList, dishList.data.dishPackages];
     },
     components: {
       GoodsType,
