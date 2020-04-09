@@ -37,10 +37,6 @@
   import {mapGetters, mapActions} from 'vuex';
   import {timeSlot, menuList, foodsList, dishMeal} from 'js/apiConfig';
 
-  // import {menuLeft} from 'js/menuLeft';
-  // import {goodRight} from 'js/goodRight';
-  // import {dishList} from 'js/dishList';
-
   export default {
     data() {
       return {
@@ -61,8 +57,8 @@
         return this.timeSlotId[this.getTimeSlot - 1]; // 早中晚id   左侧菜单id
       },
       ...mapGetters([
-        'getLoadingState',
-        'getLoadingLocal',
+        // 'getLoadingState',
+        // 'getLoadingLocal',
         'getMerchantIdStr',
         'getTimeSlot',
         'getCartGoodsMorning',
@@ -80,13 +76,6 @@
           this.currentMenuIndex = index;
           this.menuIndex = index;
           this._foodsRight(item.dishClassId);
-          // 判断如果点击当前菜单不发送请求
-          // if (item.dishClassId === this.menusLeft[index].dishClassId) {
-          //   return;
-          // } else {
-          //   // 缓存菜单 id
-          //   this._foodsRight(item.dishClassId);
-          // }
         }, 100);
       },
       toggleShopCart() {
@@ -104,15 +93,16 @@
           'type': 1
         }
         timeSlot(timeSlotData).then(res => {
-          // console.log('早中晚',res.data.data);
+          this.setLoadingState(true);
           this.setTimeSlotData(res.data.data);
           // 缓存早中晚id
           res.data.data.forEach(item => {
             this.timeSlotId.push(item.dishClassId);
           });
-          // // 默认加载早餐
-          // this._menuLeft(this.timeSlotId[0]);
         }).catch(err => {
+          this.setLoadingState(true);
+          this.errMsg = undefined;
+          this.errMsgText = '服务器出错~~ o(╯□╰)o ~~';
           console.log(`https://segmentfault.com/search?q=${err}`);
         });
       },
@@ -124,14 +114,8 @@
           'dishClassId': this.foodsParams  // 早中晚id
         }
         menuList(menuLeftData).then(res => {
+          this.setLoadingState(true);
           this.menusLeft = res.data.data;
-          // this.menusLeft.forEach(item =>{
-          //   this.menusId.push(item);
-          // });
-          // console.log('左侧', this.menusLeft[0].dishClassId);
-          // 右侧请求数据
-          // this.menuIndex = this.menusLeft[0].dishClassId;
-          // this._foodsRight(this.timeSlotId[0], this.menusLeft[0].dishClassId);
           this._foodsRight(this.menusLeft[0].dishClassId);
         }).catch(err => {
           console.log(`https://segmentfault.com/search?q=${err}`);
@@ -149,12 +133,9 @@
         }
         foodsList(foodsRightData).then(res => {
           this.goodsList = res.data.data;
-          // console.log('右侧', res.data.data);
           this._dishMeal();  // 套餐接口
           // 接口右侧菜品数据、套餐合并数据
           this.mergeDishList = [this.goodsList, this.dishMealList.dishPackages];
-          // this.menusLeft = res.data.data;
-          // this.setTimeSlotData(res.data.data);
         }).catch(err => {
           console.log(`https://segmentfault.com/search?q=${err}`);
         });
@@ -167,15 +148,14 @@
           'category': 1
         }
         dishMeal(dishMealData).then(res => {
-          // console.log('套餐', res.data.data);
           this.dishMealList = res.data.data;
         }).catch(err => {
           console.log(`https://segmentfault.com/search?q=${err}`);
         });
       },
       ...mapActions([
+        'setLoadingState',
         'setTimeSlotData',
-        'setMenuLeftData',
         'setLoadingLocal',
         'setShopcartListState',
         'setShopcartShow'
@@ -185,14 +165,10 @@
       foodsParams() {
         this.currentMenuIndex = 0; //左侧菜单样式重置
         this._menuLeft();
-        // this._foodsRight();
       }
     },
     created() {
       this._timeSlot();
-
-      // this.goodsList = goodRight.data;
-      // this.mergeDishList = [this.goodsList, dishList.data.dishPackages];
     },
     components: {
       GoodsType,

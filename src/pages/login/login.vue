@@ -1,7 +1,7 @@
 <template>
   <view>
     <!-- #ifdef MP-WEIXIN -->
-    <view v-if="isCanUse">
+    <view v-if="isCanUser">
       <view>
         <view class='header'>
           <image src='/static/logo.png'></image>
@@ -21,31 +21,28 @@
   </view>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
+  import {getOpenId} from 'js/apiConfig';
 
   export default {
     data() {
       return {
-        SessionKey: '',
-        OpenId: '',
-        nickName: null,
-        avatarUrl: null,
-        isCanUse: uni.getStorageSync('isCanUse') || true //默认为true
+        timeStamp: this.$store.getters.getTimeStamp,
+        isCanUser: uni.getStorageSync('isCanUser') || true //默认为true
       };
     },
     methods: {
-      //第一授权获取用户信息===》按钮触发
+      // 第一授权获取用户信息,按钮触发
       wxGetUserInfo() {
-        let _this = this;
         uni.getUserInfo({
           provider: 'weixin',
           success: function (infoRes) {
-            console.log('打印信息：', infoRes);
-            let nickName = infoRes.userInfo.nickName; //昵称
-            let avatarUrl = infoRes.userInfo.avatarUrl; //头像
             try {
-              uni.setStorageSync('isCanUse', false);//记录是否第一次授权  false:表示不是第一次授权
-              // _this.updateUserInfo();
+              uni.setStorageSync('isCanUser', false); //记录是否第一次授权  false:表示不是第一次授权
+              uni.redirectTo({
+                url: '../../pages/index/index',
+                animationType: 'slide-in-left'
+              });
             } catch (e) {
             }
           },
@@ -53,77 +50,51 @@
           }
         });
       },
-
       //登录
       login() {
-        let _this = this;
         uni.showLoading({
           title: '登录中...'
         });
-
         // 1.wx获取登录用户code
         uni.login({
           provider: 'weixin',
           success: function (loginRes) {
             let code = loginRes.code;
-            if (!_this.isCanUse) {
+            if (uni.getStorageSync('isCanUser') === false) {
               //非第一次授权获取用户信息
               uni.getUserInfo({
                 provider: 'weixin',
                 success: function (infoRes) {
-                  //获取用户信息后向调用信息更新方法
-                  let nickName = infoRes.userInfo.nickName; //昵称
-                  let avatarUrl = infoRes.userInfo.avatarUrl; //头像
-                  // _this.updateUserInfo();//调用更新信息方法
+                  uni.redirectTo({
+                    url: '../../pages/index/index',
+                    animationType: 'slide-in-left'
+                  });
                 }
               });
             }
-
-            //2.将用户登录code传递到后台置换用户SessionKey、OpenId等信息
-            // uni.request({
-            //   url: '服务器地址',
-            //   data: {
-            //     code: code,
-            //   },
-            //   method: 'GET',
-            //   header: {
-            //     'content-type': 'application/json'
-            //   },
-            //   success: (res) => {
-            //     //openId、或SessionKdy存储//隐藏loading
-            //     uni.hideLoading();
-            //   }
-            // });
+            const codeData = {
+              code: code,
+              sessionId: ''
+            }
+            getOpenId(codeData).then(res => {
+              const userInfoData = JSON.stringify(res.data.data);
+              uni.setStorageSync('userInfo', userInfoData);
+              uni.hideLoading();
+            }).catch(err => {
+              console.log(`https://segmentfault.com/search?q=${err}`);
+            });
           },
         });
-      },
-      //向后台更新信息
-      // updateUserInfo() {
-      //   let _this = this;
-      //   uni.request({
-      //     url: 'url',//服务器端地址
-      //     data: {
-      //       appKey: this.$store.state.appKey,
-      //       customerId: _this.customerId,
-      //       nickName: _this.nickName,
-      //       headUrl: _this.avatarUrl
-      //     },
-      //     method: 'POST',
-      //     header: {
-      //       'content-type': 'application/json'
-      //     },
-      //     success: (res) => {
-      //       if (res.data.state == "success") {
-      //         uni.reLaunch({//信息更新成功后跳转到小程序首页
-      //           url: '/pages/index/index'
-      //         });
-      //       }
-      //     }
-      //
-      //   });
-      // }
+      }
     },
     onLoad() {
+      // 隐藏左上角返回首页按钮
+      uni.hideHomeButton();
+      this.login();
+    },
+    onShow() {
+      // 隐藏左上角返回首页按钮
+      uni.hideHomeButton();
     }
   }
 </script>
@@ -137,27 +108,23 @@
     height: 300rpx;
     line-height: 450rpx;
   }
-
   .header image {
     width: 320rpx;
     height: 156rpx;
   }
-
   .content {
     margin-left: 50rpx;
     margin-bottom: 90rpx;
   }
-
   .content text {
     display: block;
     color: #9d9d9d;
     margin-top: 40rpx;
-    font-size: 24rpx;
+    font-size: $font-size24;
   }
-
   .bottom {
     border-radius: 80rpx;
     margin: 70rpx 50rpx;
-    font-size: 35rpx;
+    font-size: $font-size36;
   }
 </style>

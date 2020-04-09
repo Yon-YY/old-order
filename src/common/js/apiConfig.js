@@ -2,6 +2,12 @@ import {getDataApi} from "./api";
 
 const url = 'http://192.168.9.42:8081';
 
+// 获取登录OpenId
+export function getOpenId(params) {
+  const path = '/wecat/getWecatOpenId';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
+  return getDataApi(url, path, 'GET', params);
+}
+
 // 早中晚
 export function timeSlot(params) {
   const path = '/dishClass/queryDishClasses';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
@@ -40,12 +46,12 @@ export function orderDetailsMsg(params) {
 
 // 配送地址
 export function addressDefault(params) {
-  const path = '/api/u/goodsOrder/selectGoodsOrderAddress';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
-  return getDataApi(url, path, 'GET', params);
+  const path = '/orderInfo/getSingleAddress';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
+  return getDataApi(url, path, 'POST', params);
 }
 
 // 提交订单确认支付
 export function submitOrder(params) {
-  const path = '/api/u/goodsOrder/submitGoodsOrderInfo';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
+  const path = '/orderInfo/submitOrderInfo';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
   return getDataApi(url, path, 'POST', params);
 }

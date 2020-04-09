@@ -8,7 +8,7 @@ export default new Vuex.Store({
     loadingState: false,  // loading组件
     loadingLocal: false, // 局部loading组件
     merchantIdStr: '', // 商家 id
-    timeSlotData: [],// 早中晚数据
+    timeSlotData: [], // 早中晚数据
     timeSlot: 1, // 早餐：1、中餐：2、晚餐：3（默认早餐：1)
     dishIndex: [], // 套餐index
     timeSlotActive: 0, // 选中餐点状态样式
@@ -62,7 +62,7 @@ export default new Vuex.Store({
           state.timeSlotActive = 0;
           let isHasMorning = state.cartGoodsMorning.some(food => {
             if (food.dishId === dishId) {
-              food.goodsNum++;
+              food.sumCount++;
               return true;
             } else {
               return false;
@@ -76,7 +76,7 @@ export default new Vuex.Store({
               img,
               dishMode,
               goodsFormat,
-              goodsNum: 1,
+              sumCount: 1,
               timeOfDay: 1
             });
           }
@@ -85,7 +85,7 @@ export default new Vuex.Store({
           state.timeSlotActive = 1;
           let isHasNoon = state.cartGoodsNoon.some(food => {
             if (food.dishId === dishId) {
-              food.goodsNum++;
+              food.sumCount++;
               return true;
             } else {
               return false;
@@ -99,7 +99,7 @@ export default new Vuex.Store({
               img,
               dishMode,
               goodsFormat,
-              goodsNum: 1,
+              sumCount: 1,
               timeOfDay: 2
             });
           }
@@ -108,7 +108,7 @@ export default new Vuex.Store({
           state.timeSlotActive = 2;
           let isHasNight = state.cartGoodsNight.some(food => {
             if (food.dishId === dishId) {
-              food.goodsNum++;
+              food.sumCount++;
               return true;
             } else {
               return false;
@@ -122,7 +122,7 @@ export default new Vuex.Store({
               img,
               dishMode,
               goodsFormat,
-              goodsNum: 1,
+              sumCount: 1,
               timeOfDay: 3
             });
           }
@@ -135,8 +135,8 @@ export default new Vuex.Store({
           state.timeSlotActive = 0;
           state.cartGoodsMorning.forEach((food, index) => {
             if (food.dishId === dishId) {
-              food.goodsNum--;
-              if (food.goodsNum === 0) {
+              food.sumCount--;
+              if (food.sumCount === 0) {
                 // 定时器作用：为减按钮留出动画时间
                 setTimeout(() => {
                   state.cartGoodsMorning.splice(index, 1);
@@ -150,8 +150,8 @@ export default new Vuex.Store({
           state.timeSlotActive = 1;
           state.cartGoodsNoon.forEach((food, index) => {
             if (food.dishId === dishId) {
-              food.goodsNum--;
-              if (food.goodsNum === 0) {
+              food.sumCount--;
+              if (food.sumCount === 0) {
                 // 定时器作用：为减按钮留出动画时间
                 setTimeout(() => {
                   state.cartGoodsNoon.splice(index, 1);
@@ -165,8 +165,8 @@ export default new Vuex.Store({
           state.timeSlotActive = 2;
           state.cartGoodsNight.forEach((food, index) => {
             if (food.dishId === dishId) {
-              food.goodsNum--;
-              if (food.goodsNum === 0) {
+              food.sumCount--;
+              if (food.sumCount === 0) {
                 // 定时器作用：为减按钮留出动画时间
                 setTimeout(() => {
                   state.cartGoodsNight.splice(index, 1);

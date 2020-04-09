@@ -14,7 +14,7 @@
                   v-for="(list, index) in goodsGroup[0]"
                   @tap="checkBoxOne(index)"
                   :class="{'checkbox-item-curr' : currArrOne.includes(index)}"
-                  :key="index">{{list}}
+                  :key="index">{{list.dishName}}
             </text>
           </view>
         </view>
@@ -28,7 +28,7 @@
                   v-for="(list, index) in goodsGroup[1]"
                   @tap="checkBoxTwo(index)"
                   :class="{'checkbox-item-curr': currArrTwo.includes(index)}"
-                  :key="index">{{list}}
+                  :key="index">{{list.dishName}}
             </text>
           </view>
         </view>
@@ -100,8 +100,8 @@
           showToast('none', '您选择的菜品与套餐不匹配', 2000);
           return;
         }
+
         // 已选的菜品
-        // this.selectFoodsArr;
         this.addGood(this.selectFoodsArr);
         // 关闭弹层
         this.closeformatWrap();
@@ -142,14 +142,12 @@
         if (this.getFormatListDetails[0]) {
           this.getFormatListDetails[0].forEach(m => {
             if (m.meatOrVegetable === 1) { // 荤菜
-              mealList.push(m.dishName);
+              mealList.push(m);
             } else {
-              vageList.push(m.dishName);
+              vageList.push(m);
             }
           });
         }
-        // console.log('数组', [mealList, vageList]);
-        // console.log(this.getDishIndex);
         return [mealList, vageList];
       },
       // 选中的菜品
@@ -158,17 +156,14 @@
         let selectArr = [];
         let mealArr = this.currArrOne;
         let vageArr = this.currArrTwo;
-        // console.log('荤菜',mealArr);
-        // // console.log('素菜',vageArr);
-        // console.log('列表',this.getFormatListDetails);
         // 荤菜
         mealArr.forEach(m => {
-          let mealNum = this.getFormatListDetails[0][m];
+          let mealNum = this.goodsGroup[0][m];
           selectArr.push(mealNum);
         });
         // // 素菜
         vageArr.forEach(v => {
-          let mealNum = this.getFormatListDetails[0][v];
+          let mealNum = this.goodsGroup[1][v];
           selectArr.push(mealNum);
         });
 
@@ -188,10 +183,9 @@
             dishDiscrete: this.getDishIndex[1].dishPackageDesc,
             dishMode: 2,
             // periodTimeClassId: this.getDishIndex[1].periodTimeClassId,
-            img:'../../static/dish.jpg',
+            img: '../../static/dish.jpg',
             price: this.getDishIndex[1].dishPackagePrice
           });
-          // console.log('套餐', this.getDishIndex[1]);
         }
         return setMeal;
       },

@@ -3,7 +3,12 @@
     <view v-for="(food, index) in goodType[0]" class="good-item"
           :key="index" v-if="food.dishMode === 1">
       <view class="good-img">
-        <image class="img" :src="food.img"></image>
+                <block v-if="food.img !== ''">
+                  <image class="img" :src="food.img"></image>
+                </block>
+                <block v-else>
+                  <image class="img" src="../../static/load-default.jpg"></image>
+                </block>
       </view>
       <view class="good-synopsis">
         <text class="good-name">{{food.dishName}}</text>
@@ -26,7 +31,9 @@
           <text class="good-desc">{{item.dishPackageDesc}}</text>
           <text class="good-price">￥{{item.dishPackagePrice}}</text>
           <view class="cartcontrol-wrapper">
-            <text class="good-format-btn" @tap.stop="selectFormat(index, item)">选择菜品</text>
+            <text class="good-format-btn" @tap.stop="selectFormat(index, item)">
+              选择菜品
+            </text>
           </view>
         </view>
       </view>
@@ -35,8 +42,9 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import {mapActions} from 'vuex';
+  import {mapGetters, mapActions} from 'vuex';
   import Cartcontrol from '../cartcontrol/cartcontrol';
+  import {showToast} from 'js/util';
 
   export default {
     props: {
@@ -45,13 +53,23 @@
         default: []
       }
     },
-    methods:{
+    data() {
+      return {
+        timeOfDay: ['早餐', '午餐', '晚餐']
+      };
+    },
+    methods: {
       // 选择菜品
       selectFormat(index, item) {
+        // 每个时间段限制只能点一份套餐
+        if (this.isDishExist[this.getTimeSlot - 1] !== 0) {
+          showToast('none', `${this.timeOfDay[this.getTimeSlot - 1]}时段只能点一份套餐`, 3000);
+          return;
+        }
+
         this.setFormatListDetails(this.goodType);
         // 点击了哪个套餐
         this.setDishIndex([index, item]);
-        // console.log(this.goodType);
         this.setFormatWrapState(false);
         this.setFormatState(true);
       },
@@ -62,17 +80,39 @@
         'setFormatState'
       ])
     },
-    computed:{
-      // 菜品
-      // goodsGroup() {
-      //   console.log('弹框', this.getGoodsGroup);
-      //   return this.getGoodsGroup;
-      // },
-      // ...mapGetters([
-      //   'getGoodsGroup'
-      // ])
-    },
-    created() {
+    computed: {
+      // 检查每个时间段是否已选过套餐
+      isDishExist() {
+        let dishExistArr = [0, 0, 0];
+        if (this.getTimeSlot === 1) {
+          this.getCartGoodsMorning.forEach(morning => {
+            if (morning.goodsFormat.length !== 0) {
+              dishExistArr[0] = morning.goodsFormat.length;
+            }
+          });
+        }
+        if (this.getTimeSlot === 2) {
+          this.getCartGoodsNoon.forEach(noon => {
+            if (noon.goodsFormat.length !== 0) {
+              dishExistArr[1] = noon.goodsFormat.length;
+            }
+          });
+        }
+        if (this.getTimeSlot === 3) {
+          this.getCartGoodsNight.forEach(night => {
+            if (night.goodsFormat.length !== 0) {
+              dishExistArr[2] = night.goodsFormat.length;
+            }
+          });
+        }
+        return dishExistArr;
+      },
+      ...mapGetters([
+        'getTimeSlot',
+        'getCartGoodsMorning',
+        'getCartGoodsNoon',
+        'getCartGoodsNight'
+      ])
     },
     components: {
       Cartcontrol

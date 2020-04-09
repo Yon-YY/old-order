@@ -17,9 +17,9 @@
       <format-dialog></format-dialog>
     </view>
     <!--Loading组件-->
-<!--    <view class="loading-wrap" :hidden="getLoadingState">-->
-<!--      <loading-layer></loading-layer>-->
-<!--    </view>-->
+    <view class="loading-wrap" :hidden="getLoadingState">
+      <loading-layer></loading-layer>
+    </view>
   </view>
 </template>
 
@@ -39,6 +39,12 @@
       }
     },
     onLoad() {
+      // 隐藏左上角返回首页按钮
+      uni.hideHomeButton();
+    },
+    onShow() {
+      // 隐藏左上角返回首页按钮
+      uni.hideHomeButton();
     },
     methods: {
       tabBarIndex(index) {

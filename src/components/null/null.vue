@@ -31,7 +31,7 @@
     }
     .null-text {
       margin-top: 40rpx;
-      font-size: $font-size-medium-x;
+      font-size: $font-size26;
       color: $color-theme;
     }
   }

@@ -7,13 +7,15 @@
       </view>
       <text class="contact-phone"
             v-if="addressText !== ''">
-        {{addressName}}（{{radioSexText[_radioSex - 1]}}）{{addressPhone}}
+        {{addressName}}（{{addressPhone}}）
       </text>
       <text class="address-text">{{addressText}}</text>
       <view class="give-time-wrap">
         <text class="give-hint">送达时间</text>
         <text class="give-time">预计明天就餐时间点送达</text>
       </view>
+      <!--遮罩层，不能点击填写，防止后台接口返回数据时，用户填写好的姓名、地址和号码信息被刷新掉-->
+      <view class="address-mask" :hidden="maskSate" @tap="clickMask"></view>
     </view>
     <!--编辑地址弹层-->
     <view class="layer-wrap address-phone-edit" :hidden="editAddressLayer">
@@ -49,18 +51,6 @@
               <text class="clear-icon" @tap="clearPhoneVal"></text>
             </view>
           </view>
-          <view class="select-sex">
-            <van-radio-group class="select-sex-box" v-model="radioSex">
-              <van-radio @tap="radioSex = radioSexArr[0]"
-                         class="sex-radio sex-m" :name="radioSexArr[0]">
-                {{radioSexText[0]}}
-              </van-radio>
-              <van-radio @tap="radioSex = radioSexArr[1]"
-                         class="sex-radio sex-w" :name="radioSexArr[1]">
-                {{radioSexText[1]}}
-              </van-radio>
-            </van-radio-group>
-          </view>
           <view class="edit-button-wrap">
             <text class="edit-btn edit-cancel-btn" @tap="editAddreesCancel">取消
             </text>
@@ -72,7 +62,8 @@
       </layer>
     </view>
     <view class="food-list-box">
-      <order-foodlist :foodsList="_foodsList"></order-foodlist>
+      <order-foodlist :foodsList="_foodsList"
+                      :payAmount="_totalPrice"></order-foodlist>
     </view>
     <view class="order-remarks border-top" @tap="editRemarks">
       <text class="remarks-text">订单备注</text>
@@ -124,14 +115,16 @@
   import OrderFoodlist from 'components/order-foodlist/order-foodlist';
   import Layer from 'components/layer/layer';
   import {mapGetters, mapActions} from 'vuex';
-  import {addressDefault, submitOrder} from '../../common/js/apiConfig';
-  import {validatePhone, showToast} from '../../common/js/util';
+  import {addressDefault, submitOrder} from 'js/apiConfig';
+  import {validatePhone, showToast} from 'js/util';
 
   export default {
     data() {
       return {
+        // timeStamp: this.$store.getters.getTimeStamp,
         foodsList: [],
         addressTips: ['添加送餐地址及联系方式', '编辑送餐地址及联系方式'], // 地址提示文字
+        maskSate: false, // 遮罩
         valAddressText: '', // 地址输入框
         valAddressName: '', // 姓名输入框
         valAddressPhone: '', // 手机输入框
@@ -140,14 +133,15 @@
         addressName: '', // 姓名
         addressPhone: '', // 手机
         remarksText: '备注', // 备注
-        radioSexArr: ['1', '2'], // 男女
-        radioSexText: ['先生', '女士'], // 男女
-        radioSex: '1', // 默认选择男
         editAddressLayer: true, // 编辑地址弹层状态
         editRemarksLayer: true // 编辑备注弹层状态
       };
     },
     methods: {
+      // 遮罩
+      clickMask() {
+        showToast('none', '网络开小差，请稍后', 1500);
+      },
       // 编辑地址
       editAddress() {
         this.valAddressText = this.addressText;
@@ -179,11 +173,17 @@
           showToast('none', '联系电话不能为空', 1500);
           return;
         }
+        // 验证手机号
+        if (!/^1[3456789]\d{9}$/.test(this.valAddressPhone)) {
+          showToast('none', '输入的手机号码无效', 1500);
+          return;
+        }
         this.editAddressLayer = true;
+
       },
       testPhone() {
-        validatePhone(this.valAddressPhone);
         // 提示框消失后清空input
+        validatePhone(this.valAddressPhone);
         setTimeout(() => {
           this.valAddressPhone = '';
         }, 1600);
@@ -212,46 +212,93 @@
       },
       // 确认支付
       confirmPayment() {
-        if (this.addressText === '' || this.addressName == '') {
-          showToast('none', '先填写送餐地址及联系方式', 3000);
-          return;
-        }
-        // 设置购物车动画
-        this.setShopcartListState(true);
-        let dataSet = [];
-        this._foodsList.forEach(food => {
-          let goodsIds = [];
-          if (food.goodsFormat.length === 0) {
-            goodsIds.push(food.goodsId);
-          } else {
-            food.goodsFormat.forEach(format => {
-              goodsIds.push(format.goodsId);
+        if (uni.getStorageSync('userInfo')) {
+          const entTime = JSON.parse(uni.getStorageSync('userInfo')).entTime;
+          if (entTime < new Date().getTime()) {
+            console.log('登录已过期');
+            uni.showModal({
+              title: '温馨提示',
+              content: '用户尚未登录或登录已过期，是否重新登录',
+              cancelText:'否',
+              confirmText:'是',
+              success: function (res) {
+                if (res.confirm) {
+                  uni.setStorageSync('isCanUser', true); // 设置登录状态
+                  uni.reLaunch({
+                    url: '../../pages/login/login',
+                    animationType: 'slide-in-right'
+                  });
+                } else if (res.cancel) {
+                  console.log('用户点击取消');
+                }
+              }
             });
+            return;
+          } else {
+            console.log('登录未过期');
+            // if (this.addressText === '' || this.addressName === '') {
+            //   showToast('none', '请填写送餐地址及联系电话', 3000);
+            //   return;
+            // }
+            // 设置购物车动画
+            this.setShopcartListState(true);
+            let merge = [];
+            let dishFood = [];
+            let dataSet = [];
+            this._foodsList.forEach(food => {
+              if (food.goodsFormat.length !== 0) {
+                food.goodsFormat.forEach(format => {
+                  dishFood.push({
+                    'dishId': format.dishId,
+                    'dishName': format.dishName,
+                    'img': format.img,
+                    'sumCount': 1,
+                    'price': format.price,
+                    'periodTimeClassId': format.periodTimeClassId,
+                    'dishClassId': format.dishClassId
+                  });
+                });
+              } else {
+                dataSet.push({
+                  'dishId': food.dishId,
+                  'dishName': food.dishName,
+                  'img': food.img,
+                  'sumCount': food.sumCount,
+                  'price': food.price,
+                  'periodTimeClassId': food.periodTimeClassId,
+                  'dishClassId': food.dishClassId
+                });
+              }
+              // 菜品和套餐中的菜品合并
+              merge = [...dishFood, ...dataSet];
+            });
+            if (this.remarksText === '备注') {
+              this.remarksText = '';
+            }
+            // 提交订单支付
+            setTimeout(() => {
+              const submitData = Object.assign({}, {dishList: merge}, {
+                'hospitalId': '8754362990002',
+                'remark': this.remarksText,
+                'orderAddress': this.addressText,
+                'deviceMarker': 'KBS1806260769',
+                'phone': this.addressPhone,
+                'userId': '5489076532003',
+                'userName': this.addressName,
+                'orderDesc': '',
+                'deviceId': '',
+                'category': 1,
+                // 'merchantId': this.getMerchantIdStr
+                'merchantId': '868576736852660224'
+                // 'dishList':[]
+              });
+              console.log('提交后台', submitData);
+              submitOrder(submitData).then(res => {
+                console.log('成功', res);
+              });
+            }, 50);
           }
-          dataSet.push({
-            "dishesType": food.dishesType,
-            "goodsCategoryId": food.goodsCategoryId,
-            "goodsId": goodsIds,
-            "goodsNum": food.goodsNum,
-            "timeOfDay": food.timeOfDay
-          });
-        });
-        if (this.remarksText === '备注') {
-          this.remarksText = '';
         }
-        const submitData = Object.assign({}, {goodsOrderDetails: dataSet}, {
-          "hospitalId": "1",
-          "merchantId": this.getMerchantIdStr,
-          "orderAddress": this.addressText,
-          "orderLinkman": this.addressName,
-          "orderRemark": this.remarksText,
-          "phone": this.addressPhone,
-          "userId": "333333"
-        });
-        console.log('提交后台', submitData);
-        submitOrder(submitData).then(res => {
-          console.log(res);
-        });
       },
       ...mapActions([
         'setShopcartListState'
@@ -272,9 +319,6 @@
           return this.addressTips[1];
         }
       },
-      _radioSex() {
-        return this.radioSex;
-      },
       _foodsList() {
         let goodsContcat = [...this.getCartGoodsMorning, ...this.getCartGoodsNoon, ...this.getCartGoodsNight];
         // console.log('初始', goodsContcat);
@@ -283,7 +327,7 @@
       _totalPrice() {
         let total = 0;
         this._foodsList.forEach(food => {
-          total += food.price * food.goodsNum;
+          total += food.price * food.sumCount;
         });
         return total;
       },
@@ -295,19 +339,26 @@
       ])
     },
     created() {
+      // 地址接口
       const addressData = {
-        'userId': '333333',
-        'merchantId': this.getMerchantIdStr
+        'hospitalId': '8754362990002',
+        'deviceMarker': 'KBS1806260769',
+        'userId': '990423437216927744'
       }
       addressDefault(addressData).then(res => {
-        if (res.data.code === 200) {
+        if (res.data.code === '200') {
+          // 隐藏遮罩
+          this.maskSate = true;
           const data = res.data.data;
           // console.log(data);
-          this.addressText = data.address;
-          this.addressName = data.linkman;
+          this.addressText = data.orderAddress;
+          this.addressName = data.orderPersonName;
           this.addressPhone = data.phone;
         }
+      }).catch(err => {
+        console.log(`https://segmentfault.com/search?q=${err}`);
       });
+      ;
     },
     components: {
       OrderFoodlist,
@@ -317,7 +368,6 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" type="text/stylus" scoped>
-  @import "../../common/stylus/variable.styl";
   .submit-order {
     padding: 32rpx 0 96rpx 0;
     min-height: calc(100vh - 128rpx);
@@ -339,13 +389,14 @@
       }
     }
     .address-view {
+      /*position: relative;*/
       padding: 0 40rpx;
       border-bottom: 16rpx $color-background solid;
       .address-input {
         display: flex;
         justify-content: space-between;
         .address-phone-text {
-          font-size: $font-size-large-xx;
+          font-size: $font-size32;
           font-weight: bold;
           color: $color-background-button;
         }
@@ -362,7 +413,7 @@
         color: $color-sub-theme;
       }
       .address-text {
-        font-size: $font-size-medium;
+        font-size: $font-size24;
         color: $color-sub-theme;
       }
       .give-time-wrap {
@@ -371,7 +422,7 @@
         padding: 32rpx 0;
         margin-top: 32rpx;
         border-top: 1px $color-background solid;
-        font-size: $font-size-medium-x;
+        font-size: $font-size26;
         .give-hint {
           color: $color-theme-b;
           font-weight: bold;
@@ -381,6 +432,13 @@
           font-weight: $font-weight-b;
         }
       }
+      .address-mask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 176rpx;
+      }
     }
     .layer-wrap {
       .title {
@@ -388,13 +446,13 @@
         margin-top: 26rpx;
         text-align: center;
         color: $color-theme-b;
-        font-size: $font-size-large-xx;
+        font-size: $font-size32;
         font-weight: bold;
       }
       .give-address-box {
         padding: 0 20rpx;
         margin-bottom: 48rpx;
-        font-size: $font-size-medium-x;
+        font-size: $font-size26;
         .give-address-item {
           position: relative;
           margin: 26rpx 0;
@@ -436,7 +494,7 @@
       display: flex;
       justify-content: space-between;
       padding: 20rpx 40rpx;
-      font-size: $font-size-medium-x;
+      font-size: $font-size26;
       .remarks-text {
         flex: 0 0 200rpx;
       }
@@ -480,13 +538,13 @@
       .payment-amount {
         padding-left: 40rpx;
         width: 510rpx;
-        font-size: $font-size-large-xxx;
+        font-size: $font-size36;
         background: $color-text;
       }
       .payment-btn {
         width: 202rpx;
         text-align: center;
-        font-size: $font-size-medium-x;
+        font-size: $font-size26;
         background: $color-background-button;
       }
     }

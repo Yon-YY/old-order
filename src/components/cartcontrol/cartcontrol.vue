@@ -1,22 +1,16 @@
 <template>
   <view>
-    <!--快餐-->
     <view class="cartcontrol" v-if="food.dishMode === 1">
       <view class="cart-decrease" @tap="decreaseCart">
         <text class="cart-icon cart-inner"
-              :class="[_food.goodsNum > 0 ? 'cart-decrease-show':'cart-decrease-hide']"></text>
+              :class="[_food.sumCount > 0 ? 'cart-decrease-show':'cart-decrease-hide']"></text>
       </view>
       <text class="cart-count"
-            :class="[_food.goodsNum > 0 ? 'cart-num-show':'cart-num-hide']">
-        {{_food.goodsNum}}
+            :class="[_food.sumCount > 0 ? 'cart-num-show':'cart-num-hide']">
+        {{_food.sumCount}}
       </text>
       <view class="cart-icon cart-add" @tap="touchOnGoods"></view>
     </view>
-    <!--套餐-->
-<!--    <view class="cartcontrol"-->
-<!--          v-else-if="food.dishMode === 2">-->
-<!--      <text class="good-format-btn" @tap.stop="selectFormat">选择菜品</text>-->
-<!--    </view>-->
     <!--小球动画-->
     <view class="ball-box" :hidden="hide_good_box"
           :style="[{left: bus_x +'px', top: bus_y +'px'}]">
@@ -31,17 +25,12 @@
 
   export default {
     props: {
-      // goods: {
-      //   type: Array,
-      //   default: []
-      // },
       food: {
         type: Object
       }
     },
     data() {
       return {
-        foodsChild: this.food,
         hide_good_box: true,
         wWidth: 0,
         hHeight: 0,
@@ -85,8 +74,8 @@
       // 监听购物车已不存在该商品
       _food: {
         handler(newVal, oldVal) {
-          if (newVal.goodsNum === undefined) {
-            this._food.goodsNum = 0;
+          if (newVal.sumCount === undefined) {
+            this._food.sumCount = 0;
           }
         },
         deep: true
@@ -95,7 +84,7 @@
     computed: {
       watchGoodsContcat() {
         let goodsContcat = [...this.getCartGoodsMorning, ...this.getCartGoodsNoon, ...this.getCartGoodsNight];
-        // console.log('goodsContcat', goodsContcat.length);
+        // console.log('goodsContcat', goodsContcat);
         return goodsContcat;
       },
       _food() {
@@ -141,14 +130,6 @@
       decreaseCart() {
         this.reduceGood(this.food.dishId);
       },
-      // 规格
-      // selectFormat() {
-      //   console.log('套餐：',this.goods)
-      //   // this.setFormatListDetails(this.goods[this.goodIndex].goodsList[this.foodIndex]);
-      //   // this.setFormatListDetails(this.goods);
-      //   this.setFormatWrapState(false);
-      //   this.setFormatState(true);
-      // },
       // 加
       touchOnGoods(e) {
         // 如果good_box正在运动
@@ -214,7 +195,6 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" type="text/stylus">
-  @import "../../common/stylus/variable.styl";
   .cartcontrol {
     .good-format-btn {
       width: 104rpx;

@@ -1,6 +1,6 @@
 <template>
   <view class="header-box">
-    <tab class="nav-tab" :tabLists="timeSlot" @tabIndex="tabTimeOf"></tab>
+    <tab :active="getTimeSlotActive" class="nav-tab" :tabLists="timeSlot" @tabIndex="tabTimeOf"></tab>
   </view>
 </template>
 
@@ -20,9 +20,7 @@
     computed: {
       timeSlot() {
         let dishName = [];
-        // console.log('vuex', this.getTimeSlotData);
        this.getTimeSlotData.forEach(item => {
-          // this.dishId.push(item.dishClassId);
          dishName.push(item.dishClassName);
         });
         return dishName;
@@ -44,12 +42,6 @@
         'setMerchantIdStr'
       ])
     },
-    // created() {
-      // tabList.data.forEach(item => {
-      //   // this.dishId.push(item.dishClassId);
-      //   this.dishName.push(item.dishClassName);
-      // });
-    // },
     components: {
       Tab
     }

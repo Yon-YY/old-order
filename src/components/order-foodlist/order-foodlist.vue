@@ -12,7 +12,9 @@
           </view>
           <view class="foods-list">
             <text class="food-num">×{{food.sumCount}}</text>
-            <text class="food-price" v-if="food.mealMode === 1">￥{{food.price}}</text>
+            <text class="food-price" v-if="food.mealMode === 1">
+              ￥{{food.price}}
+            </text>
           </view>
         </view>
       </view>
@@ -92,7 +94,7 @@
             .food-img {
               display: block;
               width: 120rpx;
-              height: 120rpx;
+              height: 100rpx;
             }
             .food-name {
               margin-left: 24rpx;

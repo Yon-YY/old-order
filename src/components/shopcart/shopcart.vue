@@ -97,10 +97,6 @@
       },
       watchGoodsContcat() {
         let goodsContcat = [...this.getCartGoodsMorning, ...this.getCartGoodsNoon, ...this.getCartGoodsNight];
-
-        // console.log('早', this.getCartGoodsMorning);
-        // console.log('中', this.getCartGoodsNoon);
-        // console.log('晚', this.getCartGoodsNight);
         return goodsContcat;
       },
       _cartGoodsContcat() {
@@ -110,28 +106,28 @@
       totalPrice() {
         let total = 0;
         this.getCartGoodsMorning.forEach(food => {
-          total += food.price * food.goodsNum;
+          total += food.price * food.sumCount;
         });
         this.getCartGoodsNoon.forEach(food => {
-          total += food.price * food.goodsNum;
+          total += food.price * food.sumCount;
         });
         this.getCartGoodsNight.forEach(food => {
-          total += food.price * food.goodsNum;
+          total += food.price * food.sumCount;
         });
         return total;
       },
       totalCount() {
-        let goodsNum = 0;
+        let sumCount = 0;
         this.getCartGoodsMorning.forEach(food => {
-          goodsNum += food.goodsNum;
+          sumCount += food.sumCount;
         });
         this.getCartGoodsNoon.forEach(food => {
-          goodsNum += food.goodsNum;
+          sumCount += food.sumCount;
         });
         this.getCartGoodsNight.forEach(food => {
-          goodsNum += food.goodsNum;
+          sumCount += food.sumCount;
         });
-        return goodsNum;
+        return sumCount;
       },
       ...mapGetters([
         'getTimeSlot',

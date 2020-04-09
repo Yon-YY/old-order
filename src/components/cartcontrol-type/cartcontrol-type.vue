@@ -4,15 +4,17 @@
     <view class="cartcontrol" v-if="good.dishMode === 1">
       <view class="cart-decrease" @tap="decreaseCartGoods">
         <text class="cart-icon cart-inner"
-              :class="[good.goodsNum > 0 ? 'cart-decrease-show':'cart-decrease-hide']"></text>
+              :class="[good.sumCount > 0 ? 'cart-decrease-show':'cart-decrease-hide']"></text>
       </view>
       <text class="cart-count"
-            :class="[good.goodsNum > 0 ? 'cart-num-show':'cart-num-hide']">
-        {{good.goodsNum}}
+            :class="[good.sumCount > 0 ? 'cart-num-show':'cart-num-hide']">
+        {{good.sumCount}}
       </text>
       <view class="cart-icon cart-add" @tap="addCartGoods"></view>
     </view>
-    <view class="dish-remove" v-else-if="good.dishMode === 2" @tap="decreaseCartGoods">移 除</view>
+    <view class="dish-remove" v-else-if="good.dishMode === 2"
+          @tap="decreaseCartGoods">移 除
+    </view>
   </view>
 </template>
 
@@ -52,7 +54,8 @@
         this.addGood(foodItem);
       },
       // 移除套餐
-      dishRemove(){},
+      dishRemove() {
+      },
       ...mapActions([
         'setTimeSlot',
         'addGood',
@@ -119,8 +122,9 @@
     }
   }
   .dish-remove {
-    width: 90rpx;
-    height: 42rpx;
+    margin-right: 20rpx;
+    width: 100rpx;
+    height: 44rpx;
     line-height: 44rpx;
     text-align: center;
     border-radius: 23px;

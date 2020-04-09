@@ -17,7 +17,6 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" type="text/stylus" scoped>
-  @import "../../common/stylus/variable.styl";
   .loading-box {
     display: flex;
     align-items: center;
@@ -31,7 +30,7 @@
     }
     .loading-text {
       margin-top: 30rpx;
-      font-size: $font-size-medium-x;
+      font-size: $font-size26;
       color: $color-button-text;
     }
   }

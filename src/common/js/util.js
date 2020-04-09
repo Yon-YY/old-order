@@ -22,6 +22,21 @@ export const showToast = (icon, title, time) => uni.showToast({
   duration: time
 });
 
+// 获取当前时间戳
+export function nowTimeStamp() {
+  return new Date().getTime();
+}
+
+// 从符号中提取内容
+// export function drawText(str){
+//   return str.replace(/[{|}]/g,""); // {}中提取内容
+// }
+//
+// // 符号分割字符串
+// export function strSplit(str, symbol){
+//   return str.split(symbol);
+// }
+
 // 判断是否为数字，不是强制转换为数字0
 // export const StringZero = num => {
 //   const reg = /^[0-9]+.?[0-9]*$/

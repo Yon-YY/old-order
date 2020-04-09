@@ -47,7 +47,7 @@
           });
         }
         if (index === 2) {
-          this._orderList(7);
+          this._orderList(8);
         } else {
           this._orderList(index);
         }
@@ -78,12 +78,6 @@
         'getMerchantIdStr'
       ])
     },
-    // watch: {
-    //   orderType() {
-    //     console.log('未支付',this.orderType);
-    //     this._orderList();
-    //   }
-    // },
     created() {
       this._orderList(this.orderType);
       // this.orderItem = ordersList.data;
