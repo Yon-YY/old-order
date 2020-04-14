@@ -28,14 +28,23 @@
     </view>
     <view :hidden="getShopcartShow" class="shopacart-mask"
           @tap="toggleShopCart"></view>
+    <!--Loading组件-->
+    <view class="loading-local-wrap" :hidden="loading">
+      <view class="loading-box vertical-center">
+        <loading-layer :loadingText="loadingText"></loading-layer>
+      </view>
+    </view>
   </view>
 </template>
 
 <script type="text/ecmascript-6">
+  import LoadingLayer from '../loading/loading';
   import GoodsType from '../goods-type/goods-type';
   import Shopcart from '../shopcart/shopcart';
+  import Null from '../null/null';
   import {mapGetters, mapActions} from 'vuex';
   import {timeSlot, menuList, foodsList, dishMeal} from 'js/apiConfig';
+  import {errState} from 'js/util'
 
   export default {
     data() {
@@ -50,6 +59,8 @@
         showScrollbar: true,  //是否显示滚动条
         scrolly: true,  //允许纵向滚动
         scrollAnimation: true, //使用动画过渡
+        loading: false, //默认第一次加载隐藏
+        loadingText: '正在加载...'
       };
     },
     computed: {
@@ -73,6 +84,7 @@
       // 点击左侧菜单
       selectMenu(item, index) {
         setTimeout(() => {
+          this.loading = false;
           this.currentMenuIndex = index;
           this.menuIndex = index;
           this._foodsRight(item.dishClassId);
@@ -92,6 +104,7 @@
           'category': 1,
           'type': 1
         }
+
         timeSlot(timeSlotData).then(res => {
           this.setLoadingState(true);
           this.setTimeSlotData(res.data.data);
@@ -101,8 +114,8 @@
           });
         }).catch(err => {
           this.setLoadingState(true);
-          this.errMsg = undefined;
-          this.errMsgText = '服务器出错~~ o(╯□╰)o ~~';
+          // 接口出错提示
+          errState();
           console.log(`https://segmentfault.com/search?q=${err}`);
         });
       },
@@ -115,9 +128,13 @@
         }
         menuList(menuLeftData).then(res => {
           this.setLoadingState(true);
+          this.loading = true;
           this.menusLeft = res.data.data;
           this._foodsRight(this.menusLeft[0].dishClassId);
         }).catch(err => {
+          this.setLoadingState(true);
+          // 接口出错提示
+          errState();
           console.log(`https://segmentfault.com/search?q=${err}`);
         });
       },
@@ -132,11 +149,16 @@
           'deviceMarker': 'KBS1806260769'
         }
         foodsList(foodsRightData).then(res => {
+          this.loading = true;
           this.goodsList = res.data.data;
           this._dishMeal();  // 套餐接口
           // 接口右侧菜品数据、套餐合并数据
+          // console.log('右侧', res.data.data);
           this.mergeDishList = [this.goodsList, this.dishMealList.dishPackages];
         }).catch(err => {
+          this.setLoadingState(true);
+          // 接口出错提示
+          errState();
           console.log(`https://segmentfault.com/search?q=${err}`);
         });
       },
@@ -149,7 +171,11 @@
         }
         dishMeal(dishMealData).then(res => {
           this.dishMealList = res.data.data;
+          // console.log('套餐', res.data.data);
         }).catch(err => {
+          this.setLoadingState(true);
+          // 接口出错提示
+          errState();
           console.log(`https://segmentfault.com/search?q=${err}`);
         });
       },
@@ -163,6 +189,7 @@
     },
     watch: {
       foodsParams() {
+        this.loading = false;
         this.currentMenuIndex = 0; //左侧菜单样式重置
         this._menuLeft();
       }
@@ -171,8 +198,10 @@
       this._timeSlot();
     },
     components: {
+      LoadingLayer,
       GoodsType,
-      Shopcart
+      Shopcart,
+      Null
     }
   };
 </script>
@@ -188,11 +217,11 @@
   }
   /*购物车隐藏时商品列表的高度*/
   .goods-hide-cart {
-    height: calc(100% - 186rpx);
+    height: calc(100% - 220rpx);
   }
   /*购物车显示时商品列表的高度*/
   .goods-show-cart {
-    height: calc(100% - 275rpx);
+    height: calc(100% - 300rpx);
   }
   .menu-list-wrapper {
     flex: 0 0 160rpx;
@@ -242,56 +271,6 @@
     font-weight: $font-weight-b;
     color: $color-sub-theme;
   }
-  /*.good-item {
-    position: relative;
-    display: flex;
-    padding-bottom 20rpx;
-    margin: 0 24rpx 20rpx 24rpx;
-  }
-  .good-item:last-child {
-    margin-bottom: 60rpx;
-  }
-  .good-img {
-    flex: 0 0 160rpx;
-    margin-right: 24rpx;
-  }
-  .good-img > .img {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-  .good-synopsis {
-    flex: 1;
-  }
-  .good-name {
-    margin: 8rpx 0 14rpx 0;
-    height: 32rpx;
-    line-height: 32rpx;
-    font-size: $font-size32;
-    font-weight: bold;
-    color: $color-text;
-  }
-  .good-desc, .good-extre {
-    display: block;
-    line-height: 22rpx;
-    font-size: $font-size22;
-    color: $color-theme;
-  }
-  .good-desc {
-    margin-bottom: 8rpx;
-  }
-  .good-price {
-    margin-top: 22rpx;
-    font-size: $font-size32;
-    color: $color-number-text;
-    font-weight: 700;
-    line-height: 32rpx;
-  }
-  .cartcontrol-wrapper {
-    position: absolute;
-    right: 6rpx;
-    bottom: 6rpx
-  }*/
   .shopacart-box {
     position: fixed;
     left: 0;
@@ -315,6 +294,12 @@
     z-index: 999;
     width: 100%;
     height: 100%
+  }
+  .loading-box {
+    border-radius: 10rpx;
+    width: 180rpx;
+    height: 190rpx;
+    background: rgba(0, 0, 0, 0.6);
   }
   .cart-show {
     animation: cartShow .8s ease 0s both;

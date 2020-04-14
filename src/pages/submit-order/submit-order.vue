@@ -121,7 +121,6 @@
   export default {
     data() {
       return {
-        // timeStamp: this.$store.getters.getTimeStamp,
         foodsList: [],
         addressTips: ['添加送餐地址及联系方式', '编辑送餐地址及联系方式'], // 地址提示文字
         maskSate: false, // 遮罩
@@ -152,6 +151,7 @@
       // 地址弹层取消
       editAddreesCancel() {
         this.editAddressLayer = true;
+        // 取消后清空输入框
       },
       // 清空地址
       clearAddressVal() {
@@ -165,28 +165,26 @@
       },
       // 地址弹层确认
       editAddreesConfirm() {
-        this.addressText = this.valAddressText;
-        this.addressName = this.valAddressName;
-        this.addressPhone = this.valAddressPhone;
         // 验证手机号码
         if (this.valAddressPhone === '') {
           showToast('none', '联系电话不能为空', 1500);
           return;
-        }
-        // 验证手机号
-        if (!/^1[3456789]\d{9}$/.test(this.valAddressPhone)) {
+        } else if (!/^1[3456789]\d{9}$/.test(this.valAddressPhone)) {// 验证手机号
           showToast('none', '输入的手机号码无效', 1500);
           return;
+        } else {
+          this.addressText = this.valAddressText;
+          this.addressName = this.valAddressName;
+          this.addressPhone = this.valAddressPhone;
+          this.editAddressLayer = true;
         }
-        this.editAddressLayer = true;
-
       },
       testPhone() {
         // 提示框消失后清空input
         validatePhone(this.valAddressPhone);
-        setTimeout(() => {
-          this.valAddressPhone = '';
-        }, 1600);
+        // setTimeout(() => {
+        //   this.clearPhoneVal();
+        // }, 1600);
       },
       // 编辑备注
       editRemarks() {
@@ -219,8 +217,8 @@
             uni.showModal({
               title: '温馨提示',
               content: '用户尚未登录或登录已过期，是否重新登录',
-              cancelText:'否',
-              confirmText:'是',
+              cancelText: '否',
+              confirmText: '是',
               success: function (res) {
                 if (res.confirm) {
                   uni.setStorageSync('isCanUser', true); // 设置登录状态
@@ -236,10 +234,10 @@
             return;
           } else {
             console.log('登录未过期');
-            // if (this.addressText === '' || this.addressName === '') {
-            //   showToast('none', '请填写送餐地址及联系电话', 3000);
-            //   return;
-            // }
+            if (this.addressText === '' || this.addressName === '') {
+              showToast('none', '请填写送餐地址及联系电话', 3000);
+              return;
+            }
             // 设置购物车动画
             this.setShopcartListState(true);
             let merge = [];
@@ -286,15 +284,34 @@
                 'userId': '5489076532003',
                 'userName': this.addressName,
                 'orderDesc': '',
-                'deviceId': '',
+                'deviceId': '0',
                 'category': 1,
                 // 'merchantId': this.getMerchantIdStr
-                'merchantId': '868576736852660224'
-                // 'dishList':[]
+                'merchantId': '868576736852660224',
+                appType: 2, // 2 为微信小程序
+                openId: JSON.parse(uni.getStorageSync('userInfo')).openId
               });
               console.log('提交后台', submitData);
               submitOrder(submitData).then(res => {
                 console.log('成功', res);
+                const payData = res.data.data;
+                uni.requestPayment({
+                  provider: 'wxpay',
+                  orderInfo: JSON.stringify(submitData),
+                  timeStamp: payData.timeStamp,
+                  nonceStr: payData.nonceStr,
+                  package: payData.package,
+                  signType: 'MD5',
+                  paySign: payData.paySign,
+                  success: function (res) {
+                    console.log('success:' + JSON.stringify(res));
+                  },
+                  fail: function (err) {
+                    console.log('fail:' + JSON.stringify(err));
+                  }
+                });
+              }).catch(err => {
+                console.log(`https://segmentfault.com/search?q=${err}`);
               });
             }, 50);
           }
@@ -350,6 +367,18 @@
           // 隐藏遮罩
           this.maskSate = true;
           const data = res.data.data;
+          if (data.infectedPatchId === null) {
+            data.infectedPatchId = '';
+          }
+          if (data.orderAddress === null) {
+            data.orderAddress = '';
+          }
+          if (data.orderPersonName === null) {
+            data.orderPersonName = '';
+          }
+          if (data.phone === null) {
+            data.phone = '';
+          }
           // console.log(data);
           this.addressText = data.orderAddress;
           this.addressName = data.orderPersonName;

@@ -55,7 +55,7 @@ export default new Vuex.Store({
     SET_CART_GOODS_NIGHT(state, cartGoodsNight) {
       state.cartGoodsNight = cartGoodsNight;
     },
-    ADD_GOOD(state, {dishId, dishName, price, img, dishMode, goodsFormat = []}) {
+    ADD_GOOD(state, {dishId, dishClassId,periodTimeClassId, dishName, price, img, dishMode, goodsFormat = []}) {
       // console.log('vuex', state.timeSlot);
       switch (state.timeSlot) {
         case 1:
@@ -71,6 +71,8 @@ export default new Vuex.Store({
           if (!isHasMorning) {
             state.cartGoodsMorning.push({
               dishId,
+              dishClassId,
+              periodTimeClassId,
               dishName,
               price,
               img,
@@ -94,6 +96,8 @@ export default new Vuex.Store({
           if (!isHasNoon) {
             state.cartGoodsNoon.push({
               dishId,
+              dishClassId,
+              periodTimeClassId,
               dishName,
               price,
               img,
@@ -117,6 +121,8 @@ export default new Vuex.Store({
           if (!isHasNight) {
             state.cartGoodsNight.push({
               dishId,
+              dishClassId,
+              periodTimeClassId,
               dishName,
               price,
               img,

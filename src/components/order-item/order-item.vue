@@ -68,7 +68,6 @@
         const itemVal = encodeURIComponent(JSON.stringify(item));
         uni.navigateTo({
           url: `../../components/order-details/order-details?item=${itemVal}`,
-          // url: `../../components/order-details/order-details`,
           animationType: 'slide-in-left',
           animationDuration: 200,
           success() {
@@ -87,7 +86,6 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" type="text/stylus" scoped>
-  @import "../../common/stylus/variable.styl";
   .order-item-wrap {
     .order-item-box {
       padding: 24rpx 32rpx 32rpx 32rpx;

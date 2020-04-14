@@ -51,7 +51,7 @@
           _self.hHeight = res.windowHeight;
         }
       });
-      this.busPos['x'] = 50;
+      this.busPos['x'] = 70;
       this.busPos['y'] = this.hHeight * 0.9;
     },
     watch: {
@@ -169,6 +169,8 @@
             this.hide_good_box = true;
             let foodItem = {
               dishId: this.food.dishId,
+              dishClassId: this.food.dishClassId,
+              periodTimeClassId: this.food.periodTimeClassId,
               dishName: this.food.dishName,
               price: this.food.price,
               img: this.food.img,

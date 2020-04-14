@@ -11,9 +11,9 @@
               nullText="暂无未支付订单"></null>
       </view>
       <!--Loading组件-->
-      <!--      <view class="loading-order-wrap" :hidden="loading">-->
-      <!--        <loading-layer :loadingText="loadingText"></loading-layer>-->
-      <!--      </view>-->
+      <view class="loading-order-wrap" :hidden="loading">
+        <loading-layer :loadingText="loadingText"></loading-layer>
+      </view>
     </view>
   </view>
 </template>
@@ -34,7 +34,8 @@
         tabTitleText: ['全部订单', '未支付', '已完成'],
         orderItem: [],
         orderType: 0, // 订单状态
-        loading: false
+        loading: false,
+        loadingText: '正在加载...'
       };
     },
     methods: {
@@ -64,6 +65,7 @@
           'category': 1
         }
         orderList(data).then(res => {
+          this.loading = true;
           if (res.data.code === '200') {
             this.loading = true;
             this.orderItem = res.data.data;

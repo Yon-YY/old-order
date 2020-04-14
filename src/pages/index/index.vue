@@ -12,7 +12,7 @@
     <view class="tab-bar-wrapper">
       <tab-bar @tabBarIndex="tabBarIndex"></tab-bar>
     </view>
-    <!--套餐规格弹框-->
+    <!--套餐选择菜品弹框-->
     <view class="foods-format-wrap" :hidden="getFormatWrapState">
       <format-dialog></format-dialog>
     </view>
@@ -29,7 +29,7 @@
   import LoadingLayer from 'components/loading/loading';
   import TabBar from 'components/tab-bar/tab-bar';
   import OrderList from 'components/order-list/order-list';
-  import formatDialog from 'components/format-dialog/format-dialog';
+  import FormatDialog from 'components/format-dialog/format-dialog';
   import {mapGetters} from 'vuex';
 
   export default {
@@ -67,7 +67,7 @@
       Goods,
       TabBar,
       OrderList,
-      formatDialog
+      FormatDialog
     }
   }
 </script>
@@ -88,5 +88,7 @@
     width: 100%;
     height: 100%
     background: rgba(0, 0, 0, 0.8);
+  }
+  .err-states {
   }
 </style>

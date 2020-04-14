@@ -173,15 +173,15 @@
   .cartcontrol-wrapper {
     position: absolute;
     right: 6rpx;
-    bottom: 6rpx;
+    bottom: 20rpx;
     .good-format-btn {
-      width: 104rpx;
-      height: 46rpx;
-      line-height: 46rpx;
+      width: 120rpx;
+      height: 52rpx;
+      line-height: 52rpx;
       text-align: center;
       border-radius: 23px;
       color: $color-button-text;
-      font-size: $font-size20;
+      font-size: $font-size24;
       background-color: $color-background-button;
     }
   }

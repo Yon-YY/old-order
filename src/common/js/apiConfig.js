@@ -1,6 +1,12 @@
 import {getDataApi} from "./api";
 
-const url = 'http://192.168.9.42:8081';
+let url = '';
+if (process.env.NODE_ENV === 'development') {
+  url = 'http://192.168.9.42:8081';
+  console.log('开发环境');
+} else {
+  console.log('生产环境');
+}
 
 // 获取登录OpenId
 export function getOpenId(params) {

@@ -27,25 +27,13 @@ export function nowTimeStamp() {
   return new Date().getTime();
 }
 
-// 从符号中提取内容
-// export function drawText(str){
-//   return str.replace(/[{|}]/g,""); // {}中提取内容
-// }
-//
-// // 符号分割字符串
-// export function strSplit(str, symbol){
-//   return str.split(symbol);
-// }
-
-// 判断是否为数字，不是强制转换为数字0
-// export const StringZero = num => {
-//   const reg = /^[0-9]+.?[0-9]*$/
-//   if (!reg.test(num)) {
-//     return 0;
-//   } else {
-//     return num;
-//   }
-// }
+// 接口出错提示
+export function errState(text='服务崩溃啦~'){
+  uni.showLoading({
+    title: text,
+    mask: true
+  });
+}
 
 // 时间戳转日期
 export function timeStampDate(timeStamp, type) {

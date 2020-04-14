@@ -7,7 +7,16 @@
         <view class="foods-list-item" v-for="(food, index) in foodsList"
               :key="index">
           <view class="foods-list">
-            <image class="food-img" :src="food.img"></image>
+            <!--            <image class="food-img" :src="food.img"></image>-->
+            <block v-if="food.img !== null">
+              <image class="food-img" :src="food.img"></image>
+            </block>
+            <block v-else>
+              <image v-if="food.mealMode === 2" class="food-img"
+                     src="../../static/dish.jpg"></image>
+              <image v-else class="food-img"
+                     src="../../static/load-default.jpg"></image>
+            </block>
             <text class="food-name">{{food.dishName}}</text>
           </view>
           <view class="foods-list">
@@ -58,6 +67,7 @@
     computed: {
       totalCount() {
         let goodsNum = 0;
+        console.log('菜品', this.foodsList);
         this.foodsList.forEach(food => {
           goodsNum += food.sumCount;
         });
@@ -72,6 +82,7 @@
   .order-food-list {
     .order-foods-wrap {
       padding: 0 20rpx 0 40rpx;
+      border-bottom: 16rpx #f5f7fa solid;
       .list-item-title {
         padding-top: 32rpx;
         margin-bottom: 32rpx;
@@ -80,8 +91,9 @@
         font-weight: bold;
       }
       .foods-list-scroll {
-        height: 300rpx;
-        overflow-y: scroll;
+        padding-bottom: 40rpx;
+        /*height: 300rpx;
+        overflow-y: scroll;*/
         .foods-list-item {
           display: flex;
           justify-content: space-between;

@@ -25,11 +25,11 @@
     width: 100%;
     height: 100%;
     .loading-icon {
-      width: 100rpx;
-      height: 100rpx;
+      width: 80rpx;
+      height: 80rpx;
     }
     .loading-text {
-      margin-top: 30rpx;
+      margin-top: 20rpx;
       font-size: $font-size26;
       color: $color-button-text;
     }

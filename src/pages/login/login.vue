@@ -53,7 +53,8 @@
       //登录
       login() {
         uni.showLoading({
-          title: '登录中...'
+          title: '登录中...',
+          masK: true
         });
         // 1.wx获取登录用户code
         uni.login({
@@ -72,17 +73,23 @@
                 }
               });
             }
-            const codeData = {
-              code: code,
-              sessionId: ''
-            }
-            getOpenId(codeData).then(res => {
-              const userInfoData = JSON.stringify(res.data.data);
-              uni.setStorageSync('userInfo', userInfoData);
-              uni.hideLoading();
-            }).catch(err => {
-              console.log(`https://segmentfault.com/search?q=${err}`);
-            });
+            setTimeout(() => {
+              const codeData = {
+                code: code,
+                sessionId: ''
+              }
+              getOpenId(codeData).then(res => {
+                const userInfoData = JSON.stringify(res.data.data);
+                // 缓存后端返回的OpenId、登录过期时间戳等信息
+                try {
+                  uni.setStorageSync('userInfo', userInfoData);
+                  uni.hideLoading();
+                } catch (e) {
+                }
+              }).catch(err => {
+                console.log(`https://segmentfault.com/search?q=${err}`);
+              });
+            }, 500);
           },
         });
       }

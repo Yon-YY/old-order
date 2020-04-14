@@ -116,12 +116,12 @@
         this.setCartAn(true);
       },
       closeformatWrap() {
+        this.setFormatState(false);
         setTimeout(() => {
           this.setFormatWrapState(true);
           this.currArrOne = [];
           this.currArrTwo = [];
-        }, 510);
-        this.setFormatState(false);
+        }, 530);
       },
       ...mapActions([
         'getGoodsGroup',
@@ -131,9 +131,6 @@
         'setCartShow',
         'setCartAn'
       ])
-    },
-    created() {
-
     },
     computed: {// 荤素菜归类
       goodsGroup() {
@@ -247,7 +244,7 @@
             width: 102%;
           }
           .checkbox-item {
-            padding: 15rpx 26rpx;
+            padding: 24rpx 30rpx;
             margin: 0 25rpx 26rpx 0;
             text-align: center;
             font-size: $font-size22;
@@ -310,10 +307,10 @@
     }
   }
   .open-an {
-    animation: openAn .5s ease 0s both;
+    animation: openAn .5s ease .2s both;
   }
   .close-an {
-    animation: closeAn .5s ease 0s both;
+    animation: closeAn .5s ease .2s both;
   }
   @-webkit-keyframes closeAn {
     from {
