@@ -31,9 +31,6 @@
         default: 1
       }
     },
-    // created() {
-    //   console.log('打印', this.good);
-    // },
     methods: {
       // 减
       decreaseCartGoods() {
@@ -52,9 +49,6 @@
           goodsFormat: this.good.goodsFormat
         }
         this.addGood(foodItem);
-      },
-      // 移除套餐
-      dishRemove() {
       },
       ...mapActions([
         'setTimeSlot',

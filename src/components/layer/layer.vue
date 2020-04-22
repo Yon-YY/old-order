@@ -11,7 +11,6 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" type="text/stylus" scoped>
-  @import "../../common/stylus/variable.styl";
   .layer-wrap {
     display: flex;
     flex-direction: column;

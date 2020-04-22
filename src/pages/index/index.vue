@@ -1,11 +1,27 @@
 <template>
   <view class="index-wrap">
-    <view class="header-content-wrap" :hidden="!tabBarState">
+    <view class="notify-mask" :hidden="notifyShow"
+          @tap="hideNotify"></view>
+    <view class="news-wrap"
+          :class="[tabBarState === false ? 'heightShow' : 'heightHide']"
+          @tap="showNotify">
+      <view class="news-notify"
+            :class="[notifyShow === true ? 'notify-hide' : 'notify-show' ]"
+            @tap.stop="hideNotify">
+        <text class="notify-text">
+          {{getMerchantInfo.nutritionCanteenDinnerTime}}
+        </text>
+      </view>
+      <van-notice-bar delay="0" speed="30"
+                      :text="getMerchantInfo.nutritionCanteenDinnerTime"/>
+      <text class="news-icon"></text>
+    </view>
+    <view class="header-content-wrap" :hidden="tabBarState">
       <m-header></m-header>
       <goods></goods>
     </view>
     <!--订单-->
-    <view :hidden="tabBarState">
+    <view v-if="tabBarState">
       <order-list class="order-main"></order-list>
     </view>
     <!--底部Tab-->
@@ -30,12 +46,13 @@
   import TabBar from 'components/tab-bar/tab-bar';
   import OrderList from 'components/order-list/order-list';
   import FormatDialog from 'components/format-dialog/format-dialog';
-  import {mapGetters} from 'vuex';
+  import {mapGetters, mapActions} from 'vuex';
 
   export default {
     data() {
       return {
-        tabBarState: true
+        tabBarState: false,
+        notifyShow: true
       }
     },
     onLoad() {
@@ -47,17 +64,27 @@
       uni.hideHomeButton();
     },
     methods: {
+      showNotify() {
+        this.notifyShow = false;
+      },
+      hideNotify() {
+        this.notifyShow = true;
+      },
       tabBarIndex(index) {
         if (index === 0) {
-          this.tabBarState = true;
-        } else {
           this.tabBarState = false;
+        } else {
+          this.tabBarState = true;
         }
-      }
+      },
+      ...mapActions([
+        'setLoadingState'
+      ])
     },
     computed: {
       ...mapGetters([
         'getLoadingState',
+        'getMerchantInfo',
         'getFormatWrapState'
       ])
     },
@@ -73,6 +100,46 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" type="text/stylus">
+  .news-wrap {
+    position: relative;
+    z-index: 999;
+    &.heightShow {
+      height 30px;
+    }
+    &.heightHide {
+      height 0;
+    }
+    .news-icon {
+      position: absolute;
+      top: 15rpx;
+      left: 15rpx;
+      width: 32rpx;
+      height: 32rpx;
+      background: url('../../static/img/news-icon.png') no-repeat;
+      background-size: cover;
+    }
+    .news-notify {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 999;
+      padding: 20rpx;
+      line-height: 36rpx;
+      background: #fffbe8;
+      .notify-text {
+        font-size: $font-size26;
+        color: #ed6a0c;
+      }
+    }
+  }
+  .notify-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 990;
+  }
   .tab-bar-wrapper {
     position: fixed;
     left: 0;
@@ -89,6 +156,26 @@
     height: 100%
     background: rgba(0, 0, 0, 0.8);
   }
-  .err-states {
+  .notify-show {
+    animation: notifyShow .3s ease-out 0s both;
+  }
+  .notify-hide {
+    animation: notifyHide .3s ease-out 0s both;
+  }
+  @-webkit-keyframes notifyShow {
+    from {
+      transform: translate3d(0, -150rpx, 0);
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  @-webkit-keyframes notifyHide {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(0, -150rpx, 0);
+    }
   }
 </style>

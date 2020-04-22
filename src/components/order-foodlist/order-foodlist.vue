@@ -7,7 +7,7 @@
         <view class="foods-list-item" v-for="(food, index) in foodsList"
               :key="index">
           <view class="foods-list">
-            <!--            <image class="food-img" :src="food.img"></image>-->
+            <!--<image class="food-img" :src="food.img"></image>-->
             <block v-if="food.img !== null">
               <image class="food-img" :src="food.img"></image>
             </block>
@@ -67,7 +67,6 @@
     computed: {
       totalCount() {
         let goodsNum = 0;
-        console.log('菜品', this.foodsList);
         this.foodsList.forEach(food => {
           goodsNum += food.sumCount;
         });

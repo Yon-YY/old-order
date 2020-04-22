@@ -68,9 +68,6 @@
         return this.timeSlotId[this.getTimeSlot - 1]; // 早中晚id   左侧菜单id
       },
       ...mapGetters([
-        // 'getLoadingState',
-        // 'getLoadingLocal',
-        'getMerchantIdStr',
         'getTimeSlot',
         'getCartGoodsMorning',
         'getCartGoodsNoon',
@@ -100,19 +97,21 @@
       _timeSlot() {
         const timeSlotData = {
           'hospitalId': '8754362990002',
-          'deviceMarker': 'KBS1806260769',
+          'deviceMarker': 'KBS888888',
           'category': 1,
           'type': 1
         }
 
         timeSlot(timeSlotData).then(res => {
           this.setLoadingState(true);
+          this.loading = true;
           this.setTimeSlotData(res.data.data);
           // 缓存早中晚id
           res.data.data.forEach(item => {
             this.timeSlotId.push(item.dishClassId);
           });
         }).catch(err => {
+          this.loading = true;
           this.setLoadingState(true);
           // 接口出错提示
           errState();
@@ -146,14 +145,13 @@
           'periodTimeClassId': this.foodsParams, // 早中晚id
           'dishClassId': dishClassId, // 左侧菜品id
           'category': 1,
-          'deviceMarker': 'KBS1806260769'
+          'deviceMarker': 'KBS888888'
         }
         foodsList(foodsRightData).then(res => {
           this.loading = true;
           this.goodsList = res.data.data;
           this._dishMeal();  // 套餐接口
           // 接口右侧菜品数据、套餐合并数据
-          // console.log('右侧', res.data.data);
           this.mergeDishList = [this.goodsList, this.dishMealList.dishPackages];
         }).catch(err => {
           this.setLoadingState(true);
@@ -166,12 +164,22 @@
       _dishMeal() {
         const dishMealData = {
           'hospitalId': '8754362990002',
-          'deviceMarker': 'KBS1806260769',
+          'deviceMarker': 'KBS888888',
           'category': 1
         }
         dishMeal(dishMealData).then(res => {
           this.dishMealList = res.data.data;
-          // console.log('套餐', res.data.data);
+          console.log('套餐', this.dishMealList);
+          this.setMerchantInfo(this.dishMealList);
+          const _this = this;
+          uni.showModal({
+            title: '温馨提示',
+            content: _this.dishMealList.hintTitle,
+            showCancel: false,
+            confirmText: '已知悉',
+            success: function (res) {
+            }
+          });
         }).catch(err => {
           this.setLoadingState(true);
           // 接口出错提示
@@ -182,6 +190,7 @@
       ...mapActions([
         'setLoadingState',
         'setTimeSlotData',
+        'setMerchantInfo',
         'setLoadingLocal',
         'setShopcartListState',
         'setShopcartShow'
@@ -217,11 +226,11 @@
   }
   /*购物车隐藏时商品列表的高度*/
   .goods-hide-cart {
-    height: calc(100% - 220rpx);
+    height: calc(100% - 260rpx);
   }
   /*购物车显示时商品列表的高度*/
   .goods-show-cart {
-    height: calc(100% - 300rpx);
+    height: calc(100% - 350rpx);
   }
   .menu-list-wrapper {
     flex: 0 0 160rpx;

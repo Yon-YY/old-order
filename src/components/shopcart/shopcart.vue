@@ -114,7 +114,8 @@
         this.getCartGoodsNight.forEach(food => {
           total += food.price * food.sumCount;
         });
-        return total;
+        // 金额四舍五入且保留两位小数点
+        return Math.round(total * 100) / 100;
       },
       totalCount() {
         let sumCount = 0;
@@ -146,7 +147,7 @@
         this.setLoadingState(false);
         uni.navigateTo({
           url: '../../pages/submit-order/submit-order',
-          animationType: 'slide-in-left',
+          animationType: 'none',
           animationDuration: 200,
           success() {
             // 隐藏loading组件
@@ -234,7 +235,7 @@
     }
     .icon-shopping-cart {
       width: 100%;
-      height: 100%
+      height: 100%;
       background: url('../../static/img/shopcart-icon.png') no-repeat;
       background-size: cover;
     }

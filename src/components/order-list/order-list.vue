@@ -23,7 +23,6 @@
   import OrderItem from '../order-item/order-item';
   import LoadingLayer from '../loading/loading';
   import Null from '../null/null';
-  import {mapGetters} from 'vuex';
   import {orderList} from 'js/apiConfig';
 
   // import {ordersList} from 'js/orderList';
@@ -35,7 +34,7 @@
         orderItem: [],
         orderType: 0, // 订单状态
         loading: false,
-        loadingText: '正在加载...'
+        loadingText: ''
       };
     },
     methods: {
@@ -60,8 +59,8 @@
           'page': 0,
           'hospitalId': '8754362990002',
           'orderType': orderType,
-          'userId': '990423437216927744',
-          'deviceMarker': 'KBS1806260769',
+          'userId': '1',
+          'deviceMarker': 'KBS888888',
           'category': 1
         }
         orderList(data).then(res => {
@@ -74,11 +73,6 @@
           }
         });
       }
-    },
-    computed: {
-      ...mapGetters([
-        'getMerchantIdStr'
-      ])
     },
     created() {
       this._orderList(this.orderType);

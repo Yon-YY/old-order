@@ -3,20 +3,22 @@
     <view v-for="(food, index) in goodType[0]" class="good-item"
           :key="index" v-if="food.dishMode === 1">
       <view class="good-img">
-                <block v-if="food.img !== ''">
-                  <image class="img" :src="food.img"></image>
-                </block>
-                <block v-else>
-                  <image class="img" src="../../static/load-default.jpg"></image>
-                </block>
+        <block v-if="food.img !== ''">
+          <image class="img" :src="food.img"></image>
+        </block>
+        <block v-else>
+          <image class="img" src="../../static/load-default.jpg"></image>
+        </block>
       </view>
       <view class="good-synopsis">
         <text class="good-name">{{food.dishName}}</text>
         <text class="good-desc">{{food.dishDiscrete}}</text>
         <text class="good-price">￥{{food.price}}</text>
         <view class="cartcontrol-wrapper">
-          <cartcontrol :food="food">
-          </cartcontrol>
+          <cartcontrol :food="food"></cartcontrol>
+          <!--遮罩，是否能点餐-->
+          <view class="is-reserve" :hidden="isReserveShow"
+                @tap="isReserve"></view>
         </view>
       </view>
     </view>
@@ -73,6 +75,20 @@
         this.setFormatWrapState(false);
         this.setFormatState(true);
       },
+      // 友好弹框提示
+      layerBox(contText) {
+        uni.showModal({
+          title: '温馨提示',
+          content: contText,
+          showCancel: false,
+          confirmText: '确定',
+          success: function (res) {
+          }
+        });
+      },
+      isReserve() {
+        this.layerBox('抱歉，当前时间段不能点餐，不便之处敬请谅解！');
+      },
       ...mapActions([
         'setFormatListDetails',
         'setDishIndex',
@@ -81,6 +97,45 @@
       ])
     },
     computed: {
+      // 是否可下单点餐
+      isReserveShow() {
+        const merchantInfo = this.getMerchantInfo;
+        // const merchantInfo = {
+        //   businessDinnerEndTime: "20:00",
+        //   businessDinnerStartTime: "",
+        //   businessLunchEndTime: "",
+        //   businessLunchStartTime: "10:00",
+        //   singleMode: 1,
+        //   stoppingOrder: 0
+        // };
+        const systemDate = `${new Date().getHours()}:${new Date().getMinutes()}`;
+        // stoppingOrder(0 接单, 1停止接单)
+        if (merchantInfo.stoppingOrder === 0) {
+          // 时间段接单
+          // singleMode(1 时间段接单，2为全天接单)
+          if (merchantInfo.singleMode === 2) {
+            // 如果时间段全为空，默认全天接单
+            if (merchantInfo.businessDinnerEndTime == '' && merchantInfo.businessDinnerStartTime == '' && merchantInfo.businessLunchEndTime == '' && merchantInfo.businessLunchStartTime == '') {
+              return true;
+            }
+            // 如果全天接单模式，上午开始时间不能为空
+            if (merchantInfo.businessLunchStartTime == '') {
+              return;
+            }
+            if (merchantInfo.businessLunchStartTime <= systemDate && systemDate <= merchantInfo.businessDinnerEndTime) {
+              return true;
+            } else {
+              return false;
+            }
+          } else {
+            if ((merchantInfo.businessLunchStartTime <= systemDate && systemDate <= merchantInfo.businessLunchEndTime) || (merchantInfo.businessDinnerStartTime <= systemDate && systemDate <= merchantInfo.businessDinnerEndTime)) {
+              return true;
+            } else {
+              return false;
+            }
+          }
+        }
+      },
       // 检查每个时间段是否已选过套餐
       isDishExist() {
         let dishExistArr = [0, 0, 0];
@@ -108,6 +163,7 @@
         return dishExistArr;
       },
       ...mapGetters([
+        'getMerchantInfo',
         'getTimeSlot',
         'getCartGoodsMorning',
         'getCartGoodsNoon',
@@ -174,6 +230,13 @@
     position: absolute;
     right: 6rpx;
     bottom: 20rpx;
+    .is-reserve {
+      position: absolute;
+      top: 0;
+      left 0;
+      width: 100%;
+      height: 100%;
+    }
     .good-format-btn {
       width: 120rpx;
       height: 52rpx;

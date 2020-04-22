@@ -22,11 +22,6 @@ export const showToast = (icon, title, time) => uni.showToast({
   duration: time
 });
 
-// 获取当前时间戳
-export function nowTimeStamp() {
-  return new Date().getTime();
-}
-
 // 接口出错提示
 export function errState(text='服务崩溃啦~'){
   uni.showLoading({

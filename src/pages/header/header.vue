@@ -1,6 +1,7 @@
 <template>
   <view class="header-box">
-    <tab :active="getTimeSlotActive" class="nav-tab" :tabLists="timeSlot" @tabIndex="tabTimeOf"></tab>
+    <tab :active="getTimeSlotActive" class="nav-tab" :tabLists="timeSlot"
+         @tabIndex="tabTimeOf"></tab>
   </view>
 </template>
 
@@ -20,8 +21,8 @@
     computed: {
       timeSlot() {
         let dishName = [];
-       this.getTimeSlotData.forEach(item => {
-         dishName.push(item.dishClassName);
+        this.getTimeSlotData.forEach(item => {
+          dishName.push(item.dishClassName);
         });
         return dishName;
       },
@@ -48,5 +49,4 @@
   };
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus" type="text/stylus">
-</style>
+<style lang="stylus" rel="stylesheet/stylus" type="text/stylus"></style>

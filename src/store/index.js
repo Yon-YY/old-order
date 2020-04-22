@@ -7,9 +7,9 @@ export default new Vuex.Store({
   state: {
     loadingState: false,  // loading组件
     loadingLocal: false, // 局部loading组件
-    merchantIdStr: '', // 商家 id
     timeSlotData: [], // 早中晚数据
     timeSlot: 1, // 早餐：1、中餐：2、晚餐：3（默认早餐：1)
+    merchantInfo: {}, // 商家信息
     dishIndex: [], // 套餐index
     timeSlotActive: 0, // 选中餐点状态样式
     cartGoodsMorning: [],  // 购物车早餐的菜品
@@ -31,14 +31,14 @@ export default new Vuex.Store({
     SET_LOADING_LOCAL(state, loadingLocal) {
       state.loadingLocal = loadingLocal;
     },
-    SET_MERCHANT_ID(state, merchantIdStr) {
-      state.merchantIdStr = merchantIdStr;
-    },
     SET_TIME_SLOT_DATA(state, timeSlotData) {
       state.timeSlotData = timeSlotData;
     },
     SET_TIME_SLOT(state, timeSlot) {
       state.timeSlot = timeSlot;
+    },
+    SET_MERCHANT_INFO(state, merchantInfo) {
+      state.merchantInfo = merchantInfo;
     },
     SET_DISH_INDEX(state, dishIndex) {
       state.dishIndex = dishIndex;
@@ -55,7 +55,7 @@ export default new Vuex.Store({
     SET_CART_GOODS_NIGHT(state, cartGoodsNight) {
       state.cartGoodsNight = cartGoodsNight;
     },
-    ADD_GOOD(state, {dishId, dishClassId,periodTimeClassId, dishName, price, img, dishMode, goodsFormat = []}) {
+    ADD_GOOD(state, {dishId, dishClassId, periodTimeClassId, dishName, price, img, dishMode, goodsFormat = []}) {
       // console.log('vuex', state.timeSlot);
       switch (state.timeSlot) {
         case 1:
@@ -209,9 +209,9 @@ export default new Vuex.Store({
   getters: {
     getLoadingState: state => state.loadingState,
     getLoadingLocal: state => state.loadingLocal,
-    getMerchantIdStr: state => state.merchantIdStr,
     getTimeSlotData: state => state.timeSlotData,
     getTimeSlot: state => state.timeSlot,
+    getMerchantInfo: state => state.merchantInfo,
     getDishIndex: state => state.dishIndex,
     getTimeSlotActive: state => state.timeSlotActive,
     getCartGoodsMorning: state => state.cartGoodsMorning,
@@ -239,14 +239,14 @@ export default new Vuex.Store({
     setLoadingLocal({commit}, loadingLocal) {
       commit('SET_LOADING_LOCAL', loadingLocal);
     },
-    setMerchantIdStr({commit}, merchantIdStr) {
-      commit('SET_MERCHANT_ID', merchantIdStr);
-    },
     setTimeSlotData({commit}, timeSlotData) {
       commit('SET_TIME_SLOT_DATA', timeSlotData);
     },
     setTimeSlot({commit}, timeSlot) {
       commit('SET_TIME_SLOT', timeSlot);
+    },
+    setMerchantInfo({commit}, merchantInfo) {
+      commit('SET_MERCHANT_INFO', merchantInfo);
     },
     setDishIndex({commit}, dishIndex) {
       commit('SET_DISH_INDEX', dishIndex);

@@ -5,6 +5,7 @@ if (process.env.NODE_ENV === 'development') {
   url = 'http://192.168.9.42:8081';
   console.log('开发环境');
 } else {
+  url = 'orderuser.kangdoctor.cn';
   console.log('生产环境');
 }
 
@@ -12,6 +13,11 @@ if (process.env.NODE_ENV === 'development') {
 export function getOpenId(params) {
   const path = '/wecat/getWecatOpenId';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
   return getDataApi(url, path, 'GET', params);
+}
+
+export function userId(params) {
+  const path = 'login/getWxUserId';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
+  return getDataApi(url, path, 'POST', params);
 }
 
 // 早中晚
@@ -44,9 +50,27 @@ export function orderList(params) {
   return getDataApi(url, path, 'POST', params);
 }
 
+// 提交退款申请
+export function orderRefund(params) {
+  const path = '/orderInfo/applyRefund';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
+  return getDataApi(url, path, 'POST', params);
+}
+
 // 订单详情
-export function orderDetailsMsg(params) {
+export function orderDetailsRefund(params) {
   const path = '/orderInfo/getOrderInfoDetail';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
+  return getDataApi(url, path, 'POST', params);
+}
+
+// 用户取消订单
+export function cancelOrder(params) {
+  const path = '/orderInfo/cancelOrder';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
+  return getDataApi(url, path, 'POST', params);
+}
+
+// 退款原因下拉框
+export function refundExplain(params) {
+  const path = '/refundReason/queryRefundReasons';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
   return getDataApi(url, path, 'POST', params);
 }
 
@@ -56,8 +80,21 @@ export function addressDefault(params) {
   return getDataApi(url, path, 'POST', params);
 }
 
+// 订单中菜品备注
+export function getRemark(params) {
+  const path = '/businessModel/getRemarkLable';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
+  return getDataApi(url, path, 'GET', params);
+}
+
 // 提交订单确认支付
 export function submitOrder(params) {
   const path = '/orderInfo/submitOrderInfo';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
   return getDataApi(url, path, 'POST', params);
 }
+
+// 订单提交后支付状态
+export function orderStatus(params) {
+  const path = '/orderInfo/getOrderPayStatus';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
+  return getDataApi(url, path, 'POST', params);
+}
+
