@@ -3,8 +3,8 @@ import {getDataApi} from "./api";
 let url = '';
 let userIdUrl = '';
 if (process.env.NODE_ENV === 'development') {
-  url = 'http://192.168.9.42:8081';
-  userIdUrl = 'http://192.168.9.42:8082';
+  url = 'http://192.168.9.66:8081';
+  userIdUrl = 'http://192.168.9.66:8082';
   console.log('开发环境');
 } else {
   url = 'orderuser.kangdoctor.cn';

@@ -50,7 +50,6 @@
   import TabBar from 'components/tab-bar/tab-bar';
   import OrderList from 'components/order-list/order-list';
   import FormatDialog from 'components/format-dialog/format-dialog';
-  import Transition from 'components/transition/transition';
   import {mapGetters, mapActions} from 'vuex';
 
   export default {
@@ -99,8 +98,7 @@
       Goods,
       TabBar,
       OrderList,
-      FormatDialog,
-      'uni-transition': Transition
+      FormatDialog
     }
   }
 </script>
