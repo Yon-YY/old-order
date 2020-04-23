@@ -147,7 +147,6 @@
         this.setLoadingState(false);
         uni.navigateTo({
           url: '../../pages/submit-order/submit-order',
-          animationType: 'none',
           animationDuration: 200,
           success() {
             // 隐藏loading组件

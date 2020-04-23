@@ -172,14 +172,16 @@
           console.log('套餐', this.dishMealList);
           this.setMerchantInfo(this.dishMealList);
           const _this = this;
-          uni.showModal({
-            title: '温馨提示',
-            content: _this.dishMealList.hintTitle,
-            showCancel: false,
-            confirmText: '已知悉',
-            success: function (res) {
-            }
-          });
+          setTimeout(() => {
+            uni.showModal({
+              title: '温馨提示',
+              content: _this.dishMealList.hintTitle,
+              showCancel: false,
+              confirmText: '确 定',
+              success: function (res) {
+              }
+            });
+          }, 3000);
         }).catch(err => {
           this.setLoadingState(true);
           // 接口出错提示

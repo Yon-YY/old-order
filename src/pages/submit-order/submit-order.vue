@@ -327,7 +327,7 @@
                 orderAddress: this.addressText,
                 deviceMarker: 'KBS888888',
                 phone: this.addressPhone,
-                userId: '1',
+                userId: uni.getStorageSync('userId'),
                 userName: this.addressName,
                 orderDesc: '',
                 deviceId: '0',
@@ -494,7 +494,7 @@
       const addressData = {
         hospitalId: '8754362990002',
         deviceMarker: 'KBS888888',
-        userId: '1'
+        userId: uni.getStorageSync('userId')
       }
       addressDefault(addressData).then(res => {
         if (res.data.code === '200') {

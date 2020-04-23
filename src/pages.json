@@ -1,11 +1,5 @@
 {
   "pages": [
-//    {
-//      "path": "components/order-details/order-details",
-//      "style": {
-//        "navigationBarTitleText": "订单详情"
-//      }
-//    },
     {
       "path": "pages/login/login",
       "style": {

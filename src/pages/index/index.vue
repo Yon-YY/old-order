@@ -17,7 +17,7 @@
       <text class="news-icon"></text>
     </view>
     <view class="header-content-wrap" :hidden="tabBarState">
-      <m-header></m-header>
+      <uni-header></uni-header>
       <goods></goods>
     </view>
     <!--订单-->
@@ -36,6 +36,10 @@
     <view class="loading-wrap" :hidden="getLoadingState">
       <loading-layer></loading-layer>
     </view>
+    <!--骨架屏遮罩-->
+    <view class="transition-wrap">
+      <uni-transition></uni-transition>
+    </view>
   </view>
 </template>
 
@@ -46,6 +50,7 @@
   import TabBar from 'components/tab-bar/tab-bar';
   import OrderList from 'components/order-list/order-list';
   import FormatDialog from 'components/format-dialog/format-dialog';
+  import Transition from 'components/transition/transition';
   import {mapGetters, mapActions} from 'vuex';
 
   export default {
@@ -89,12 +94,13 @@
       ])
     },
     components: {
-      'm-header': Header,
+      'uni-header': Header,
       LoadingLayer,
       Goods,
       TabBar,
       OrderList,
-      FormatDialog
+      FormatDialog,
+      'uni-transition': Transition
     }
   }
 </script>

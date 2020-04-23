@@ -1,8 +1,10 @@
 import {getDataApi} from "./api";
 
 let url = '';
+let userIdUrl = '';
 if (process.env.NODE_ENV === 'development') {
   url = 'http://192.168.9.42:8081';
+  userIdUrl = 'http://192.168.9.42:8082';
   console.log('开发环境');
 } else {
   url = 'orderuser.kangdoctor.cn';
@@ -15,9 +17,10 @@ export function getOpenId(params) {
   return getDataApi(url, path, 'GET', params);
 }
 
-export function userId(params) {
-  const path = 'login/getWxUserId';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
-  return getDataApi(url, path, 'POST', params);
+// 获取登录userId
+export function getUserId(params) {
+  const path = '/login/getWxUserId';// 域名、接口、请求类型(默认get请求)、请求参数(默认可为空)、设置请求头、参数是否加密(可传对象或方法)
+  return getDataApi(userIdUrl, path, 'POST', params);
 }
 
 // 早中晚

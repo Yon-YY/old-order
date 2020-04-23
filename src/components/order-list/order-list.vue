@@ -59,7 +59,7 @@
           'page': 0,
           'hospitalId': '8754362990002',
           'orderType': orderType,
-          'userId': '1',
+          'userId': uni.getStorageSync('userId'),
           'deviceMarker': 'KBS888888',
           'category': 1
         }

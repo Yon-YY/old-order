@@ -219,7 +219,7 @@
         }
         const refundData = {
           orderId: this.orderReceived.orderId,
-          userId: '1',
+          userId: uni.getStorageSync('userId'),
           refundReasonId: this.selectCache.refundReasonId, // 退款原因id
           refunds: this.desc, // 退款说明
           deviceMarker: 'KBS888888'
