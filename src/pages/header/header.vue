@@ -1,6 +1,6 @@
 <template>
   <view class="header-box">
-    <tab :active="getTimeSlotActive" class="nav-tab" :tabLists="timeSlot"
+    <tab :active="getTimeSlotActive" :tabLists="timeSlot"
          @tabIndex="tabTimeOf"></tab>
   </view>
 </template>
@@ -11,13 +11,6 @@
   // import {tabList} from 'js/tabList';
 
   export default {
-    data() {
-      return {
-        // timeOfDay: ['早餐', '午餐', '晚餐'],
-        // dishId: [],
-        // dishName: []
-      }
-    },
     computed: {
       timeSlot() {
         let dishName = [];

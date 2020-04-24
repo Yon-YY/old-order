@@ -101,7 +101,6 @@
           'category': 1,
           'type': 1
         }
-
         timeSlot(timeSlotData).then(res => {
           this.setLoadingState(true);
           this.loading = true;
@@ -110,6 +109,7 @@
           res.data.data.forEach(item => {
             this.timeSlotId.push(item.dishClassId);
           });
+          this._dishMeal();  // 套餐接口
         }).catch(err => {
           this.loading = true;
           this.setLoadingState(true);
@@ -150,7 +150,7 @@
         foodsList(foodsRightData).then(res => {
           this.loading = true;
           this.goodsList = res.data.data;
-          this._dishMeal();  // 套餐接口
+          // this._dishMeal();  // 套餐接口
           // 接口右侧菜品数据、套餐合并数据
           this.mergeDishList = [this.goodsList, this.dishMealList.dishPackages];
         }).catch(err => {
@@ -169,19 +169,19 @@
         }
         dishMeal(dishMealData).then(res => {
           this.dishMealList = res.data.data;
-          console.log('套餐', this.dishMealList);
+          // console.log('套餐', this.dishMealList);
           this.setMerchantInfo(this.dishMealList);
           const _this = this;
-          setTimeout(() => {
-            uni.showModal({
-              title: '温馨提示',
-              content: _this.dishMealList.hintTitle,
-              showCancel: false,
-              confirmText: '确 定',
-              success: function (res) {
-              }
-            });
-          }, 3000);
+          // setTimeout(() => {
+          //   uni.showModal({
+          //     title: '温馨提示',
+          //     content: _this.dishMealList.hintTitle,
+          //     showCancel: false,
+          //     confirmText: '确 定',
+          //     success: function (res) {
+          //     }
+          //   });
+          // }, 3000);
         }).catch(err => {
           this.setLoadingState(true);
           // 接口出错提示
