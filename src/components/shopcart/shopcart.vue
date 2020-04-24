@@ -20,7 +20,7 @@
     </view>
     <view class="shopcart-list" :hidden="getShopcartListState"
           :class="[getShopcartShow ? 'shopcart-hide' : 'shopcart-show']">
-      <view class="list-header" :hidden="getShopcartListState">
+      <view class="list-header" :hidden="getShopcartListState" @touchmove.stop.prevent="moveHandle">
         <text class="title">已选商品</text>
         <view class="empty" @tap="emptyShopcart">
           <text class="clear-iocn"></text>
@@ -62,11 +62,6 @@
     watch: {
       watchGoodsContcat: {
         handler(newVal, oldVal) {
-          // if (newVal.length === 0) {
-          //   // 设置购物车动画
-          //   this.setShopcartListState(true);
-          //   this.setShopcartShow(true);
-          // }
           if (newVal.length === 0) {
             // 设置购物车动画
             this.setShopcartListState(true);
@@ -174,6 +169,9 @@
           }, 510);
         }
         this.setShopcartShow(!this.getShopcartShow);
+      },
+      moveHandle() {
+        return false;
       },
       ...mapActions([
         'setLoadingState',

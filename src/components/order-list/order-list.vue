@@ -8,7 +8,7 @@
       <order-item :orderItem="orderItem"></order-item>
       <view class="null-box">
         <null v-if="orderItem.length === 0 || orderItem === null"
-              nullText="暂无未支付订单"></null>
+              nullText="暂无订单数据"></null>
       </view>
       <!--Loading组件-->
       <view class="loading-order-wrap" :hidden="loading">

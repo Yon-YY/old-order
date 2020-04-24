@@ -129,6 +129,7 @@
         </view>
       </layer>
     </view>
+    <view class="pay-mask" :hidden="payState"></view>
   </view>
 </template>
 
@@ -165,7 +166,8 @@
         editAddressLayer: true, // 编辑地址弹层状态
         editRemarksLayer: true, // 编辑备注弹层状态
         orderSuccess: true, // 订单提交成功弹框
-        submitData: null // 提交的数据，用于传数据到跳转页面
+        submitData: null, // 提交的数据，用于传数据到跳转页面
+        payState: true
       };
     },
     methods: {
@@ -249,6 +251,7 @@
       // 确认支付
       confirmPayment() {
         const _this = this;
+        this.payState = false;
         if (uni.getStorageSync('userInfo')) {
           const entTime = JSON.parse(uni.getStorageSync('userInfo')).entTime;
           if (entTime < new Date().getTime()) {
@@ -323,7 +326,7 @@
             setTimeout(() => {
               const submitData = Object.assign({}, {dishList: merge}, {
                 hospitalId: '8754362990002',
-                remark: this.valRemarksText === '' ? this.checkCont.toString() : `${this.checkCont.toString()},${this.valRemarksText}`, // 备注
+                remark: this.remarksText === '' ? this.checkCont.toString() : `${this.checkCont.toString()},${this.valRemarksText}`, // 备注
                 orderAddress: this.addressText,
                 deviceMarker: 'KBS888888',
                 phone: this.addressPhone,
@@ -354,13 +357,15 @@
                   paySign: payData.paySign,
                   success: function (res) {
                     _this.orderSuccess = false;
+                    _this.payState = true;
                     console.log('success:' + JSON.stringify(res));
                     const stateData = {
                       orderNo: payData.orderNo,
                       orderPayType: 2, //支付方式 1 支付宝 2 微信 3 现金支付
                       hospitalId: '8754362990002',
                       deviceMarker: 'KBS888888',
-                      category: 1
+                      category: 1,
+                      appType: 2
                     }
                     orderStatus(stateData).then(state => {
                       console.log('状态', state);
@@ -373,38 +378,29 @@
                       orderId: payData.orderId,
                       orderType: 1,
                       deviceMarker: 'KBS888888',
-                      category: '1'
+                      category: 1
                     }
-                    uni.showModal({
-                      title: '温馨提示',
-                      content: '您确定放弃支付并且取消订单？',
-                      cancelText: '否',
-                      confirmText: '是',
-                      success: function (res) {
-                        if (res.confirm) {
-                          cancelOrder(cancelData).then(cancelResult => {
-                            uni.hideLoading();
-                            console.log('取消', cancelResult);
-                            uni.showToast({
-                              title: '订单取消成功',
-                              duration: 2000,
-                              success: function (res) {
-                                setTimeout(() => {
-                                  // 跳转后清空购物车
-                                  _this.clearShopcart();
-                                  uni.reLaunch({
-                                    url: '../../pages/index/index'
-                                  });
-                                }, 2500);
-                              }
+                    uni.showLoading({
+                      title: '正在取消订单'
+                    });
+                    cancelOrder(cancelData).then(cancelResult => {
+                      uni.hideLoading();
+                      console.log('取消', cancelResult);
+                      uni.showToast({
+                        title: '订单取消成功',
+                        duration: 1000,
+                        success: function (res) {
+                          setTimeout(() => {
+                            // 跳转后清空购物车
+                            _this.clearShopcart();
+                            uni.reLaunch({
+                              url: '../../pages/index/index'
                             });
-                          }).catch(err => {
-                            console.log(`https://segmentfault.com/search?q=${err}`);
-                          });
-                        } else if (res.cancel) {
-                          console.log('用户点击取消');
+                          }, 2000);
                         }
-                      }
+                      });
+                    }).catch(err => {
+                      console.log(`https://segmentfault.com/search?q=${err}`);
                     });
                     console.log('fail:' + JSON.stringify(err));
                   }
@@ -770,6 +766,14 @@
           }
         }
       }
+    }
+    .pay-mask {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 999;
+      width: 100%;
+      height: 100%;
     }
   }
 </style>

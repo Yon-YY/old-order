@@ -27,7 +27,7 @@
       <shopcart></shopcart>
     </view>
     <view :hidden="getShopcartShow" class="shopacart-mask"
-          @tap="toggleShopCart"></view>
+          @tap="toggleShopCart" @touchmove.stop.prevent="moveHandle"></view>
     <!--Loading组件-->
     <view class="loading-local-wrap" :hidden="loading">
       <view class="loading-box vertical-center">
@@ -92,6 +92,9 @@
         setTimeout(() => {
           this.setShopcartShow(true);
         }, 510);
+      },
+      moveHandle() {
+        return false;
       },
       // 早中晚接口数据
       _timeSlot() {

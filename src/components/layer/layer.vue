@@ -1,5 +1,5 @@
 <template>
-  <view class="layer-wrap">
+  <view class="layer-wrap" @touchmove.stop.prevent="moveHandle">
     <view class="layer-content-box">
       <slot></slot>
     </view>
@@ -7,7 +7,13 @@
 </template>
 
 <script type="text/ecmascript-6">
-  export default {};
+  export default {
+    methods: {
+      moveHandle() {
+        return false;
+      }
+    }
+  };
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" type="text/stylus" scoped>

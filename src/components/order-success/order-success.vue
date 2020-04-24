@@ -3,12 +3,6 @@
     <view class="desc-state-text">
       <text class="back-home-icon" @tap="home"></text>
       <text class="back-home-text" @tap="home">首页</text>
-      <!--      <text class="desc-state" :class="_orderStateText">-->
-      <!--        {{orderReceived.orderTypeText}}-->
-      <!--      </text>-->
-      <!--      <text class="desc-time" v-if="orderDetails.orderType === 5">-->
-      <!--        预计明天就餐时间点送达-->
-      <!--      </text>-->
     </view>
     <view class="order-details-box">
       <order-foodlist :titleState="titleState"
@@ -45,7 +39,7 @@
       </view>
       <view class="desc-item">
         <text class="desc-left">订单备注</text>
-        <text class="desc-right">{{orderReceived.remark}}</text>
+        <text class="desc-right">{{remarks}}</text>
       </view>
     </view>
     <!--Loading组件-->
@@ -71,6 +65,7 @@
         payAmount: uni.getStorageSync('payAmount'), // 总价
         titleState: true,
         listItemTitle: '订单信息',
+        remarks: '', // 备注
         loading: true
       };
     },
@@ -115,14 +110,8 @@
       uni.hideHomeButton();
       // 接收上一个页面传入的对象
       this.orderReceived = JSON.parse(decodeURIComponent(params.item));
-      // let total = 0;
-      // this.orderReceived.dishList.forEach(food => {
-      //   total += food.price * food.sumCount;
-      // });
-      // console.log('数据',this.orderReceived);
-      // console.log('金额',total);
-      //
-      // this.payAmount = total;
+      const remarkStr = this.orderReceived.remark;
+      this.remarks = remarkStr.substring(0, remarkStr.lastIndexOf(','));
     },
     onShow() {
       // 隐藏左上角返回首页按钮

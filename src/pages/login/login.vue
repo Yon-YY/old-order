@@ -105,7 +105,7 @@
             let code = loginRes.code;
             const entTime = uni.getStorageSync('userInfo');
             if (uni.getStorageSync('isCanUser') === false && JSON.parse(entTime).entTime > new Date().getTime()) {
-              console.log('登录未过期');
+              // console.log('登录未过期');
               //非第一次授权获取用户信息
               uni.getUserInfo({
                 provider: 'weixin',
@@ -120,9 +120,15 @@
                 }
               });
             } else {
-              console.log('登录已过期');
+              // console.log('登录已过期');
               _this.isOverdue = false;
               uni.setStorageSync('isCanUser', '');
+              uni.showToast({
+                title: '登录已过期',
+                icon: 'loading',
+                mask: true,
+                duration: 2000
+              });
               setTimeout(() => {
                 const codeData = {
                   code: code,

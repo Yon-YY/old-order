@@ -43,13 +43,14 @@
       </view>
       <view class="desc-item">
         <text class="desc-left">订单备注</text>
-        <text class="desc-right">{{orderDetails.orderRemark}}</text>
+        <text class="desc-right">{{remarks}}</text>
       </view>
-      <text class="cancel-order" v-if="orderDetails.orderType ===  3"
+      <text class="cancel-order"
+            v-if="orderDetails.orderPayType === 3 || orderDetails.orderType === 1 || orderDetails.orderType === 3 || orderDetails.orderType === 4"
             @tap="cancelOrderTap">取消订单
       </text>
       <text class="refund" @tap="refund"
-            v-if="orderDetails.orderType === 8 || orderDetails.orderType === 11">
+            v-if="orderDetails.orderType === 4 || orderDetails.orderType === 5 || orderDetails.orderType === 6 || orderDetails.orderType === 10 || orderDetails.orderType === 11">
         退款
       </text>
       <view class="layer-wrap" :hidden="applyNotes">
@@ -117,10 +118,10 @@
       return {
         orderReceived: {}, // 接收上一个页面传入的对象
         orderDetails: {},
+        remarks: '', // 备注
         titleState: true,
         listItemTitle: '商品信息',
         applyNotes: true, // 申请退款框显隐
-        // applyNotes: false, // 申请退款框显隐
         isSelectShow: false, // 下拉框显隐
         refundExplainArr: [], // 退款原因
         refundSelect: '请选择', // 下拉框选中内容
@@ -143,12 +144,13 @@
           orderId: this.orderReceived.orderId,
           orderType: this.orderReceived.orderType,
           deviceMarker: 'KBS888888',
-          category: '1'
+          category: 1,
+          appType: 2
         }
         uni.showModal({
           title: '温馨提示',
           content: '您确定取消该订单？',
-          cancelText: '取消',
+          cancelText: '取 消',
           confirmText: '确 定',
           success: function (res) {
             if (res.confirm) {
@@ -222,7 +224,8 @@
           userId: uni.getStorageSync('userId'),
           refundReasonId: this.selectCache.refundReasonId, // 退款原因id
           refunds: this.desc, // 退款说明
-          deviceMarker: 'KBS888888'
+          deviceMarker: 'KBS888888',
+          appType: 2
         }
         orderRefund(refundData).then(res => {
           console.log('提交', res);
@@ -304,6 +307,9 @@
         // 订单详情
         orderDetailsRefund(refundData).then(res => {
           this.orderDetails = res.data.data;
+          // 备注截取最后一个逗号
+          const remarkStr = this.orderDetails.remark;
+          this.remarks = remarkStr.substring(0, remarkStr.lastIndexOf(','));
         }).catch(err => {
           console.log(`https://segmentfault.com/search?q=${err}`);
         });
