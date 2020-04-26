@@ -137,6 +137,8 @@
   import OrderFoodlist from 'components/order-foodlist/order-foodlist';
   import Layer from 'components/layer/layer';
   import {mapGetters, mapActions} from 'vuex';
+  import {validatePhone, showToast} from 'js/util';
+  import {params} from 'js/config';
   import {
     addressDefault,
     getRemark,
@@ -144,7 +146,6 @@
     cancelOrder,
     orderStatus
   } from 'js/apiConfig';
-  import {validatePhone, showToast} from 'js/util';
 
   export default {
     data() {
@@ -273,7 +274,6 @@
                 }
               }
             });
-            // return;
           } else {
             console.log('登录未过期');
             if (this.addressText === '' || this.addressName === '') {
@@ -323,20 +323,21 @@
             uni.setStorageSync('payAmount', this._totalPrice);
             // 提交订单支付
             const openId = JSON.parse(uni.getStorageSync('userInfo')).openId;
+            const mergeParam = Object.assign({}, {dishList: merge}, params);
             setTimeout(() => {
-              const submitData = Object.assign({}, {dishList: merge}, {
-                hospitalId: '8754362990002',
-                remark: this.remarksText === '' ? this.checkCont.toString() : `${this.checkCont.toString()},${this.valRemarksText}`, // 备注
+              const submitData = Object.assign({}, mergeParam, {
+                // hospitalId: '8754362990002',
+                // deviceMarker: 'KBS888888',
+                // deviceId: '0', // 小程序为空
+                // category: 1,
+                // appType: 2, // 2 为微信小程序
+                remark: this.valRemarksText === '' ? this.checkCont.toString() : `${this.checkCont.toString()},${this.valRemarksText}`, // 备注, // 备注
                 orderAddress: this.addressText,
-                deviceMarker: 'KBS888888',
                 phone: this.addressPhone,
                 userId: uni.getStorageSync('userId'),
                 userName: this.addressName,
                 orderDesc: '',
-                deviceId: '0',
-                category: 1,
                 merchantId: this.getMerchantInfo.merchantId,
-                appType: 2, // 2 为微信小程序
                 openId: openId
               });
               console.log('提交后台', submitData);
@@ -359,14 +360,14 @@
                     _this.orderSuccess = false;
                     _this.payState = true;
                     console.log('success:' + JSON.stringify(res));
-                    const stateData = {
-                      orderNo: payData.orderNo,
-                      orderPayType: 2, //支付方式 1 支付宝 2 微信 3 现金支付
-                      hospitalId: '8754362990002',
-                      deviceMarker: 'KBS888888',
-                      category: 1,
-                      appType: 2
-                    }
+                    const stateData = Object.assign({}, params, {
+                      // hospitalId: '8754362990002',
+                      // deviceMarker: 'KBS888888',
+                      // category: 1,
+                      // appType: 2,
+                      // orderPayType: 2, //支付方式 1 支付宝 2 微信 3 现金支付
+                      orderNo: payData.orderNo
+                    });
                     orderStatus(stateData).then(state => {
                       console.log('状态', state);
                     }).catch(err => {
@@ -487,11 +488,11 @@
     },
     created() {
       // 地址接口
-      const addressData = {
-        hospitalId: '8754362990002',
-        deviceMarker: 'KBS888888',
+      const addressData = Object.assign({}, params, {
+        // hospitalId: '8754362990002',
+        // deviceMarker: 'KBS888888',
         userId: uni.getStorageSync('userId')
-      }
+      });
       addressDefault(addressData).then(res => {
         if (res.data.code === '200') {
           // 隐藏遮罩

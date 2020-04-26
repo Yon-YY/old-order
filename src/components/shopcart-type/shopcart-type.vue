@@ -5,7 +5,7 @@
           v-for="(food, index) in shopcartType"
           :key="index">
       <view class="good-img">
-        <image class="img" :src="food.img"></image>
+        <image class="img" lazy-load="true" :src="food.img"></image>
       </view>
       <view class="good-synopsis">
         <text class="good-name">{{food.dishName}}</text>

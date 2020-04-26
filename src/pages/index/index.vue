@@ -2,18 +2,15 @@
   <view class="index-wrap">
     <view class="notify-mask" :hidden="notifyShow"
           @tap="hideNotify"></view>
-    <view class="news-wrap"
-          :class="[tabBarState === false ? 'heightShow' : 'heightHide']"
+    <view class="news-wrap" :class="[tabBarState === false ? 'heightShow' : 'heightHide']"
           @tap="showNotify">
-      <view class="news-notify"
-            :class="[notifyShow === true ? 'notify-hide' : 'notify-show' ]"
-            @tap.stop="hideNotify">
+      <view class="news-notify" :class="[notifyShow === true ? 'notify-hide' : 'notify-show' ]" @tap.stop="hideNotify">
         <text class="notify-text">
-          {{getMerchantInfo.nutritionCanteenDinnerTime}}
+          {{notifyText}}
         </text>
       </view>
       <van-notice-bar delay="0" speed="30"
-                      :text="getMerchantInfo.nutritionCanteenDinnerTime"/>
+                      :text="notifyText"/>
       <text class="news-icon"></text>
     </view>
     <view class="header-content-wrap" :hidden="tabBarState">
@@ -59,14 +56,6 @@
         notifyShow: true
       }
     },
-    onLoad() {
-      // 隐藏左上角返回首页按钮
-      uni.hideHomeButton();
-    },
-    onShow() {
-      // 隐藏左上角返回首页按钮
-      uni.hideHomeButton();
-    },
     methods: {
       showNotify() {
         this.notifyShow = false;
@@ -86,6 +75,13 @@
       ])
     },
     computed: {
+      notifyText() {
+        if (this.getMerchantInfo.nutritionCanteenDinnerTime === '') {
+          return '欢迎您使用点餐小程序，祝您用餐愉快！';
+        } else {
+          return this.getMerchantInfo.nutritionCanteenDinnerTime;
+        }
+      },
       ...mapGetters([
         'getLoadingState',
         'getMerchantInfo',
@@ -99,6 +95,27 @@
       TabBar,
       OrderList,
       FormatDialog
+    },
+    onLoad() {
+      // 隐藏左上角返回首页按钮
+      uni.hideHomeButton();
+    },
+    onShow() {
+      // 隐藏左上角返回首页按钮
+      uni.hideHomeButton();
+    },
+    // 分享
+    onShareAppMessage(res) {
+      if (res.from === 'button') {// 来自页面内分享按钮
+        console.log(res.target)
+      }
+      return {
+        title: '吃饭方便又快捷，快用手机下单点餐吧~',
+        path: '/pages/login/login', //页面 path
+        content: '',
+        desc: '', //自定义分享描述
+        imageUrl: '/static/share-img.jpg'
+      }
     }
   }
 </script>

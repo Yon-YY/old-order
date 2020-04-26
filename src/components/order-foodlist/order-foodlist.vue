@@ -7,9 +7,8 @@
         <view class="foods-list-item" v-for="(food, index) in foodsList"
               :key="index">
           <view class="foods-list">
-            <!--<image class="food-img" :src="food.img"></image>-->
             <block v-if="food.img !== null">
-              <image class="food-img" :src="food.img"></image>
+              <image class="food-img" lazy-load="true" :src="food.img"></image>
             </block>
             <block v-else>
               <image v-if="food.mealMode === 2" class="food-img"

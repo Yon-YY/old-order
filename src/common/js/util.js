@@ -54,6 +54,11 @@ export function timeStampDate(timeStamp, type) {
   }
 }
 
+// 月份、日期、时间补零
+export function zeroize(date) {
+  return date < 10 ? `0${date}` : date;
+}
+
 //判断字符是否为空的方法
 const isEmpty = (obj) => {
   if (typeof obj == "undefined" || obj == null || obj == "") {
@@ -61,11 +66,6 @@ const isEmpty = (obj) => {
   } else {
     return false;
   }
-}
-
-// 月份、日期、时间补零
-function zeroize(date) {
-  return date < 10 ? `0${date}` : date;
 }
 
 

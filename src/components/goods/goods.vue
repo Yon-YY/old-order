@@ -43,8 +43,9 @@
   import Shopcart from '../shopcart/shopcart';
   import Null from '../null/null';
   import {mapGetters, mapActions} from 'vuex';
-  import {timeSlot, menuList, foodsList, dishMeal} from 'js/apiConfig';
+  import {params} from 'js/config';
   import {errState} from 'js/util'
+  import {timeSlot, menuList, foodsList, dishMeal} from 'js/apiConfig';
 
   export default {
     data() {
@@ -98,12 +99,12 @@
       },
       // 早中晚接口数据
       _timeSlot() {
-        const timeSlotData = {
-          'hospitalId': '8754362990002',
-          'deviceMarker': 'KBS888888',
-          'category': 1,
+        const timeSlotData = Object.assign({}, params, {
+          // 'hospitalId': '8754362990002',
+          // 'deviceMarker': 'KBS888888',
+          // 'category': 1,
           'type': 1
-        }
+        });
         timeSlot(timeSlotData).then(res => {
           this.setLoadingState(true);
           this.loading = true;
@@ -123,11 +124,11 @@
       },
       // 左侧菜单列表数据
       _menuLeft() {
-        const menuLeftData = {
-          'hospitalId': '8754362990002',
-          'category': 1,
+        const menuLeftData = Object.assign({}, params, {
+          // 'hospitalId': '8754362990002',
+          // 'category': 1,
           'dishClassId': this.foodsParams  // 早中晚id
-        }
+        });
         menuList(menuLeftData).then(res => {
           this.setLoadingState(true);
           this.loading = true;
@@ -142,14 +143,14 @@
       },
       // 右侧菜品列表接口请求
       _foodsRight(dishClassId) { // 左侧菜单id
-        const foodsRightData = {
+        const foodsRightData = Object.assign({}, params, {
+          // 'hospitalId': '8754362990002',
+          // 'category': 1,
+          // 'deviceMarker': 'KBS888888',
           'pageSize': 100,
-          'hospitalId': '8754362990002',
           'periodTimeClassId': this.foodsParams, // 早中晚id
-          'dishClassId': dishClassId, // 左侧菜品id
-          'category': 1,
-          'deviceMarker': 'KBS888888'
-        }
+          'dishClassId': dishClassId // 左侧菜品id
+        });
         foodsList(foodsRightData).then(res => {
           this.loading = true;
           this.goodsList = res.data.data;
@@ -165,14 +166,14 @@
       },
       // 套餐接口请求
       _dishMeal() {
-        const dishMealData = {
-          'hospitalId': '8754362990002',
-          'deviceMarker': 'KBS888888',
-          'category': 1
-        }
+        const dishMealData = Object.assign({}, params,{
+          // 'hospitalId': '8754362990002',
+          // 'deviceMarker': 'KBS888888',
+          // 'category': 1
+        });
         dishMeal(dishMealData).then(res => {
           this.dishMealList = res.data.data;
-          // console.log('套餐', this.dishMealList);
+          console.log('套餐', this.dishMealList);
           this.setMerchantInfo(this.dishMealList);
           const _this = this;
           // setTimeout(() => {
@@ -184,7 +185,7 @@
           //     success: function (res) {
           //     }
           //   });
-          // }, 3000);
+          // }, 2000);
         }).catch(err => {
           this.setLoadingState(true);
           // 接口出错提示

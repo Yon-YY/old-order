@@ -2,6 +2,10 @@
 text {
   display: block;
 }
+//使用 image 可能导致样式生效较慢，出现 “闪一下” 的情况，设置 image{will-change: transform} ,可优化此问题
+image {
+  will-change: transform;
+}
 //loading组件外层
 .loading-wrap {
   position: fixed;
@@ -70,7 +74,6 @@ text {
 ::-webkit-scrollbar {
   display: none;
 }
-
 .index-wrap {
   .van-notice-bar {
     padding-left: 30px;

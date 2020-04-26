@@ -165,14 +165,6 @@
         });
 
         // 套餐菜品合并入购物车数据
-        // setMeal = Object.assign({}, {goodsFormat: selectArr}, {
-        //   dishId: this.getFormatListDetails.dishId,
-        //   periodTimeClassId: this.getFormatListDetails.periodTimeClassId,
-        //   dishName: this.getFormatListDetails.dishName,
-        //   price: this.getFormatListDetails.price,
-        //   img: this.getFormatListDetails.img,
-        //   dishMode: this.getFormatListDetails.dishMode
-        // });
         if (this.getDishIndex[1]) {
           setMeal = Object.assign({}, {goodsFormat: selectArr}, {
             dishId: this.getDishIndex[1].dishPackageId,

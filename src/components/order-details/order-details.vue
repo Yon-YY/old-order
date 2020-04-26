@@ -104,14 +104,13 @@
   import OrderFoodlist from '../order-foodlist/order-foodlist';
   import {mapGetters, mapActions} from 'vuex';
   import {showToast, timeStampDate} from 'js/util';
+  import {device, params} from 'js/config';
   import {
     orderDetailsRefund,
     cancelOrder,
     refundExplain,
     orderRefund
   } from 'js/apiConfig';
-
-  // import {ordersDetails} from 'js/orderDetails';
 
   export default {
     data() {
@@ -140,13 +139,14 @@
       // 取消订单
       cancelOrderTap() {
         const _this = this;
-        const cancelData = {
+        const cancelData = Object.assign({}, params, {
+          // deviceMarker: 'KBS888888',
+          // category: 1,
+          // appType: 2,
           orderId: this.orderReceived.orderId,
-          orderType: this.orderReceived.orderType,
-          deviceMarker: 'KBS888888',
-          category: 1,
-          appType: 2
-        }
+          orderType: this.orderReceived.orderType
+
+        });
         uni.showModal({
           title: '温馨提示',
           content: '您确定取消该订单？',
@@ -219,14 +219,14 @@
           showToast('none', '请填写退款说明', 3000);
           return;
         }
-        const refundData = {
+        const refundData = Object.assign({}, params, {
+          // deviceMarker: 'KBS888888',
+          // appType: 2,
           orderId: this.orderReceived.orderId,
           userId: uni.getStorageSync('userId'),
           refundReasonId: this.selectCache.refundReasonId, // 退款原因id
-          refunds: this.desc, // 退款说明
-          deviceMarker: 'KBS888888',
-          appType: 2
-        }
+          refunds: this.desc // 退款说明
+        });
         orderRefund(refundData).then(res => {
           console.log('提交', res);
           if (res.data.code === '200') {
@@ -291,19 +291,19 @@
       // 接收上一个页面传入的对象
       this.orderReceived = JSON.parse(decodeURIComponent(params.item));
       if (this.orderReceived) {
-        const explainData = {
-          'deviceMarker': 'KBS888888'
-        }
+        const explainData = Object.assign({}, device, {
+          // deviceMarker: 'KBS888888'
+        });
         // 退款原因
         refundExplain(explainData).then(res => {
           this.refundExplainArr = res.data.data;
         }).catch(err => {
           console.log(`https://segmentfault.com/search?q=${err}`);
         });
-        const refundData = {
-          'deviceMarker': 'KBS888888',
-          'orderId': this.orderReceived.orderId
-        }
+        const refundData = Object.assign({}, device, {
+          // deviceMarker: 'KBS888888',
+          orderId: this.orderReceived.orderId
+        });
         // 订单详情
         orderDetailsRefund(refundData).then(res => {
           this.orderDetails = res.data.data;

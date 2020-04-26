@@ -4,7 +4,7 @@
           :key="index" v-if="food.dishMode === 1">
       <view class="good-img">
         <block v-if="food.img !== ''">
-          <image class="img" :src="food.img"></image>
+          <image class="img" lazy-load="true" :src="food.img"></image>
         </block>
         <block v-else>
           <image class="img" src="../../static/load-default.jpg"></image>
@@ -46,7 +46,7 @@
 <script type="text/ecmascript-6">
   import {mapGetters, mapActions} from 'vuex';
   import Cartcontrol from '../cartcontrol/cartcontrol';
-  import {showToast} from 'js/util';
+  import {showToast, zeroize} from 'js/util';
 
   export default {
     props: {
@@ -81,7 +81,7 @@
           title: '温馨提示',
           content: contText,
           showCancel: false,
-          confirmText: '确定',
+          confirmText: '确 定',
           success: function (res) {
           }
         });
@@ -99,16 +99,17 @@
     computed: {
       // 是否可下单点餐
       isReserveShow() {
-        const merchantInfo = this.getMerchantInfo;
-        // const merchantInfo = {
-        //   businessDinnerEndTime: "20:00",
-        //   businessDinnerStartTime: "",
-        //   businessLunchEndTime: "",
-        //   businessLunchStartTime: "10:00",
-        //   singleMode: 1,
-        //   stoppingOrder: 0
-        // };
-        const systemDate = `${new Date().getHours()}:${new Date().getMinutes()}`;
+        // const merchantInfo = this.getMerchantInfo;
+        const merchantInfo = {
+          businessDinnerEndTime: "15:00",
+          businessDinnerStartTime: "",
+          businessLunchEndTime: "",
+          businessLunchStartTime: "08:00",
+          singleMode: 2,
+          stoppingOrder: 0
+        };
+        // 时间个位数时前面补0 zeroize
+        const systemDate = `${zeroize(new Date().getHours())}:${zeroize(new Date().getMinutes())}`;
         // stoppingOrder(0 接单, 1停止接单)
         if (merchantInfo.stoppingOrder === 0) {
           // 时间段接单

@@ -23,9 +23,8 @@
   import OrderItem from '../order-item/order-item';
   import LoadingLayer from '../loading/loading';
   import Null from '../null/null';
+  import {params} from 'js/config';
   import {orderList} from 'js/apiConfig';
-
-  // import {ordersList} from 'js/orderList';
 
   export default {
     data() {
@@ -54,15 +53,15 @@
       },
       _orderList(orderType) {
         this.loading = false;
-        const data = {
+        const data = Object.assign({}, params, {
           'pageSize': 9999,
           'page': 0,
-          'hospitalId': '8754362990002',
+          // 'hospitalId': '8754362990002',
+          // 'deviceMarker': 'KBS888888',
+          // 'category': 1,
           'orderType': orderType,
-          'userId': uni.getStorageSync('userId'),
-          'deviceMarker': 'KBS888888',
-          'category': 1
-        }
+          'userId': uni.getStorageSync('userId')
+        });
         orderList(data).then(res => {
           this.loading = true;
           if (res.data.code === '200') {
@@ -76,7 +75,6 @@
     },
     created() {
       this._orderList(this.orderType);
-      // this.orderItem = ordersList.data;
     },
     components: {
       Tab,

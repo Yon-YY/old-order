@@ -32,6 +32,7 @@
 
 <script type="text/ecmascript-6">
   import LoadingLayer from 'components/loading/loading';
+  import {device} from 'js/config';
   import {getOpenId, getUserId} from 'js/apiConfig';
 
   export default {
@@ -56,18 +57,17 @@
             // console.log('登录', infoRes);
             // 获取userId
             const userInfo = infoRes.userInfo;
-            const userIdData = {
+            const userIdData = Object.assign({}, device, {
               openid: JSON.parse(uni.getStorageSync('userInfo')).openId,
               nickname: userInfo.nickName, //昵称
               sex: userInfo.gender, //0为未知 1为男性，2为女性
               province: userInfo.province, //省份
               city: userInfo.city,
               country: userInfo.country,
-              headimgurl: userInfo.avatarUrl,
-              deviceMarker: 'KBS888888'
-            };
+              headimgurl: userInfo.avatarUrl
+            });
             getUserId(userIdData).then(res => {
-              console.log('userId', res);
+              // console.log('userId', res);
               try {
                 uni.setStorageSync('userId', res.data.data.userId);
               } catch (e) {
@@ -79,7 +79,6 @@
               uni.setStorageSync('isCanUser', false); //记录是否第一次授权  false:表示不是第一次授权
               uni.redirectTo({
                 url: '../../pages/index/index',
-                animationType: 'none',
                 success() {
                   _this.loading = true;
                 }
