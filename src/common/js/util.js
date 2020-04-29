@@ -14,6 +14,41 @@ export const validatePhone = value => {
   }
 }
 
+/*
+* 防抖
+* 效果：短时间内大量触发同一事件，只会执行一次函数
+* fn [function] 需要防抖的函数
+* delay [number] 毫秒，防抖期限值
+*/
+export function debounce(fn, delay) {
+  let timer = null;
+  return function () {
+    if (timer) {
+      clearTimeout(timer); // 当前正在一个计时过程中，并且又触发了相同事件。所以要取消当前的计时，重新开始计时
+    }
+    timer = setTimeout(fn, delay); //当前并没有在计时，那么就开始一个计时
+  }
+}
+
+/*
+* 节流
+* 效果：短时间内大量触发同一事件，在函数执行一次之后，该函数在指定的时间期限内不再工作，直至过了这段时间才重新生效
+*/
+export function throttle(fn, delay) {
+  let valid = true;
+  return function () {
+    if (!valid) {
+      return false;
+    }
+    // 执行函数并且在间隔期内把状态位设为无效
+    valid = false
+    setTimeout(() => {
+      fn();
+      valid = true;
+    }, delay);
+  }
+}
+
 // 授权过期提示
 export function overdueRemind() {
   uni.showModal({
@@ -49,6 +84,11 @@ export function errState(text = '服务崩溃啦~') {
     title: text,
     mask: true
   });
+}
+
+// 去掉字符串前后空格
+export function strTrim(str) {
+  return str.replace(/(^\s*)|(\s*$)/g, "");
 }
 
 // 时间戳转日期

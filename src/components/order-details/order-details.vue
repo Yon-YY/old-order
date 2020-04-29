@@ -21,7 +21,7 @@
         <text class="right-text">{{orderDetails.orderNo}}</text>
       </view>
       <view class="massage-item">
-        <text class="left-text">支付时间</text>
+        <text class="left-text">下单时间</text>
         <text class="right-text">{{_timeConver}}</text>
       </view>
       <view class="massage-item">
@@ -46,7 +46,8 @@
         <text class="desc-right">{{orderDetails.remark}}</text>
       </view>
       <block>
-        <view class="btn-main" v-if="monitorState === false">
+        <view class="btn-main" v-if="monitorState === false"
+              :class="[orderDetails.orderType !== 1 ? 'no-box-shadow':'']">
           <view class="pay-remind-main" v-if="orderDetails.orderType === 1">
             <text class="remind-title">订单剩余支付时间</text>
             <count-down class="count-down"
@@ -215,7 +216,7 @@
           mask: true
         });
         try {
-          const itemVal = encodeURIComponent(uni.getStorageSync('submitData'));
+          const itemVal = encodeURIComponent(JSON.stringify(uni.getStorageSync('submitData')));
           console.log('详情', uni.getStorageSync('submitData'));
           setTimeout(() => {
             uni.reLaunch({
@@ -396,7 +397,7 @@
         return this.getMerchantInfo.merchantPhone;
       },
       _timeConver() {
-        return timeStampDate(this.orderDetails.orderValidPayTime);
+        return timeStampDate(this.orderDetails.orderCreateTime);
       },
       _orderStateText() {
         const state = this.orderDetails.orderType;
@@ -514,6 +515,9 @@
         flex-wrap: wrap;
         border-top: #f5f7fa 1px solid;
         box-shadow: 0 6px 12px -6px rgba(0, 0, 0, 0.1);
+        &.no-box-shadow {
+          box-shadow: none;
+        }
         .pay-remind-main {
           padding: 30rpx 0 30rpx 0;
           margin: 50rpx auto 0 auto;

@@ -42,18 +42,11 @@
         <text class="desc-right">{{orderReceived.remark}}</text>
       </view>
     </view>
-    <!--Loading组件-->
-    <view class="loading-local-wrap" :hidden="loading">
-      <view class="loading-box vertical-center">
-        <loading-layer></loading-layer>
-      </view>
-    </view>
   </view>
 </template>
 
 <script type="text/ecmascript-6">
   import OrderFoodlist from '../order-foodlist/order-foodlist';
-  import LoadingLayer from '../loading/loading';
   import {mapActions} from 'vuex';
   import {timeStampDate} from 'js/util';
 
@@ -62,22 +55,25 @@
       return {
         orderNo: uni.getStorageSync('orderNo'),
         orderReceived: {}, // 接收上一个页面传入的对象
+        dishList: {},
         payAmount: uni.getStorageSync('payAmount'), // 总价
         titleState: true,
         listItemTitle: '订单信息',
         remarks: '', // 备注
-        loading: true
       };
     },
     methods: {
       home() {
         const _this = this;
-        this.loading = false;
+        uni.showLoading({
+          title: '正在加载...',
+          mask: true
+        });
         setTimeout(() => {
           uni.reLaunch({
             url: '../../pages/index/index',
             success() {
-              _this.loading = true;
+              uni.hideLoading();
               _this.setTabBarState([0, false]);
             }
           }, 1000);
@@ -98,14 +94,13 @@
       },
     },
     components: {
-      OrderFoodlist,
-      LoadingLayer
+      OrderFoodlist
     },
     onLoad(params) {
       // 隐藏左上角返回首页按钮
       uni.hideHomeButton();
       // 接收上一个页面传入的对象
-      this.orderReceived = JSON.parse(decodeURIComponent(params.item));
+      this.orderReceived = JSON.parse(JSON.parse(decodeURIComponent(params.item)));
     },
     onShow() {
       // 隐藏左上角返回首页按钮

@@ -116,27 +116,16 @@
       </view>
     </view>
     <view class="payment-box">
-      <text class="payment-amount">￥{{_totalPrice}}</text>
-      <text class="payment-btn" @tap="confirmPayment">确认支付</text>
+      <view class="payment-main" :hidden="successBtn">
+        <text class="payment-amount">￥{{_totalPrice}}</text>
+        <text class="payment-btn" @tap="confirmPayment">确认支付</text>
+      </view>
     </view>
     <!--订单提交成功弹框-->
     <view :hidden="orderSuccess">
       <success-layer class="success-layer-box" :isHidden="orderSuccess"
                      @checkOrder="checkOrder"></success-layer>
     </view>
-    <!--    <view class="order-success-wrap" :hidden="orderSuccess">-->
-    <!--      <layer-->
-    <!--          :class="[orderSuccess === true ? 'close-layer-an' : 'open-layer-an']">-->
-    <!--        <view class="success-layer-main">-->
-    <!--          <text class="success-icon"></text>-->
-    <!--          <text class="success-text">订单提交成功！</text>-->
-    <!--          <view class="success-button-wrap">-->
-    <!--            <text class="success-btn home-btn" @tap="backHome">返回首页</text>-->
-    <!--            <text class="success-btn check-btn" @tap="checkOrder">订单详情</text>-->
-    <!--          </view>-->
-    <!--        </view>-->
-    <!--      </layer>-->
-    <!--    </view>-->
     <view class="pay-mask" :hidden="payState" @tap="toPay"></view>
   </view>
 </template>
@@ -146,7 +135,7 @@
   import Layer from 'components/layer/layer';
   import SuccessLayer from 'components/success-layer/success-layer';
   import {mapGetters, mapActions} from 'vuex';
-  import {validatePhone, showToast, overdueRemind} from 'js/util';
+  import {validatePhone, showToast, overdueRemind, strTrim} from 'js/util';
   import {params} from 'js/config';
   import {
     addressDefault,
@@ -176,8 +165,9 @@
         editAddressLayer: true, // 编辑地址弹层状态
         editRemarksLayer: true, // 编辑备注弹层状态
         orderSuccess: true, // 订单提交成功弹框
-        submitData: null, // 提交的数据，用于传数据到跳转页面
-        payState: true
+        submitData: {}, // 提交的数据，用于传数据到跳转页面
+        payState: true,
+        successBtn: false // 提交成功，隐藏支付按钮
       };
     },
     methods: {
@@ -238,8 +228,19 @@
       },
       // 地址弹层确认
       editAddreesConfirm() {
+        if (strTrim(this.valAddressText) === '') {
+          this.valAddressText = '';
+          showToast('none', '请填写送餐地址', 1500);
+          return;
+        }
+        if (strTrim(this.valAddressName) === '') {
+          this.valAddressName = '';
+          showToast('none', '请填写联系人', 1500);
+          return;
+        }
         // 验证手机号码
-        if (this.valAddressPhone === '') {
+        if (strTrim(this.valAddressPhone) === '') {
+          this.valAddressPhone = '';
           showToast('none', '联系电话不能为空', 1500);
           return;
         } else if (!/^1[3456789]\d{9}$/.test(this.valAddressPhone)) {// 验证手机号
@@ -258,7 +259,7 @@
       },
       // 编辑备注
       editRemarks() {
-        if (this.remarksText === '备注') {
+        if (strTrim(this.remarksText) === '备注') {
           this.valRemarksText = '';
         } else {
           this.valRemarksText = this.remarksText;
@@ -315,10 +316,6 @@
             // });
           } else {
             console.log('登录未过期');
-            if (this.addressText === '' || this.addressName === '') {
-              showToast('none', '请填写送餐地址及联系电话', 3000);
-              return;
-            }
             // 设置购物车动画
             this.setShopcartListState(true);
             let merge = [];
@@ -388,8 +385,13 @@
               // _this.orderSuccess = false;
               // 跳转页面时传输
               this.submitData = submitData;
+              uni.showLoading({
+                title: '请稍后...',
+                mask: true
+              });
               submitOrder(submitData).then(res => {
                 console.log('成功', res);
+                uni.hideLoading();
                 const payData = res.data.data;
                 uni.setStorageSync('orderNo', payData.orderNo);
                 // 缓存支付信息，用于再次支付
@@ -404,6 +406,7 @@
                   success: function (res) {
                     _this.orderSuccess = false;
                     _this.payState = true;
+                    _this.successBtn = true;
                     // 隐藏购物车
                     _this.setCartShow(true);
                     _this.setCartAn(false);
@@ -474,9 +477,9 @@
             } else if (res.cancel) {
               uni.showModal({
                 title: '温馨提示',
-                content: '您确定要放弃支付该订单吗？',
-                cancelText: '取 消',
-                confirmText: '确 定',
+                content: '是否稍后再支付该订单？',
+                cancelText: '否',
+                confirmText: '是',
                 success: function (res) {
                   if (res.confirm) {
                     uni.showLoading({
@@ -491,6 +494,7 @@
                         success: function (cancel) {
                           uni.hideLoading();
                           // 隐藏购物车
+                          _this.setTimeSlot(1); // 跳转后初始化数据
                           _this.setCartShow(true);
                           _this.setCartAn(false);
                           _this.setTabBarState([0, false]);
@@ -498,7 +502,7 @@
                       });
                     }, 500);
                   } else if (res.cancel) {
-                    console.log('用户点击取消');
+                    console.log('用户点击否');
                   }
                 }
               });
@@ -516,17 +520,8 @@
         this.setCartGoodsNoon([]);
         this.setCartGoodsNight([]);
       },
-      // 返回首页
-      // backHome() {
-      //   // 跳转后初始化，清空购物车
-      //   this.clearShopcart();
-      //   uni.reLaunch({
-      //     url: '../../pages/index/index'
-      //   });
-      // },
       // 查看成功提交的订单详情
       checkOrder() {
-        // 跳转后初始化，清空购物车
         this.orderSuccess = true;
         uni.showLoading({
           title: '正在加载...',
@@ -552,6 +547,7 @@
         'setCartGoodsNoon',
         'setCartGoodsNight',
         'setShopcartShow',
+        'setTimeSlot',
         'setCartAn',
         'setCartShow'
       ])
@@ -680,7 +676,7 @@
     .input-clear {
       position: absolute;
       right: 3%;
-      bottom: 25rpx;
+      bottom: 22rpx;
       z-index: 999;
       width: 36rpx;
       height: 36rpx;
@@ -764,7 +760,7 @@
             padding: 16rpx 0;
           }
           .order-edit-input {
-            padding: 15rpx 10rpx;
+            padding: 15rpx 70rpx 15rpx 10rpx;
             background: $color-background;
             border-radius: 8rpx;
             border: 1px solid #E8E9EC;
@@ -854,21 +850,25 @@
       position: fixed;
       bottom: 0;
       left: 0;
-      display: flex;
+      z-index: 1000;
       height: 88rpx;
       line-height: 88rpx;
       color: $color-button-text;
-      .payment-amount {
-        padding-left: 40rpx;
-        width: 510rpx;
-        font-size: $font-size36;
-        background: $color-text;
-      }
-      .payment-btn {
-        width: 202rpx;
-        text-align: center;
-        font-size: $font-size26;
-        background: $color-background-button;
+      .payment-main {
+        display: flex;
+        width: 100%;
+        .payment-amount {
+          padding-left: 40rpx;
+          width: 510rpx;
+          font-size: $font-size36;
+          background: $color-text;
+        }
+        .payment-btn {
+          width: 202rpx;
+          text-align: center;
+          font-size: $font-size26;
+          background: $color-background-button;
+        }
       }
     }
     .success-layer-box {
@@ -880,58 +880,11 @@
       height: 100vh;
       background: $color-dialog-background;
     }
-    /*.success-layer-box::after {
-      content: '';
+    .pay-mask {
       position: fixed;
       top: 0;
       left: 0;
-      z-index: 999;
-      width: 100vw;
-      height: 100vh;
-      background: $color-dialog-background;
-    }*/
-    /*.order-success-wrap {
-      .success-layer-main {
-        width: 100%;
-        height: 100%;
-        .success-icon {
-          margin: 50rpx auto;
-          width: 150rpx;
-          height: 150rpx;
-          background: url('../../static/img/success.png') no-repeat;
-          background-size: cover;
-        }
-        .success-text {
-          width: 100%;
-          text-align: center;
-          font-size: $font-size36;
-        }
-        .success-button-wrap {
-          display: flex;
-          justify-content: space-around;
-          padding: 20rpx 0;
-          margin: 100rpx 0 40rpx 0;
-          .success-btn {
-            width: 200rpx;
-            line-height: 70rpx;
-            text-align: center;
-            border-radius: 8rpx;
-            color: $color-button-text;
-          }
-          .home-btn {
-            background: $color-input-placeholder;
-          }
-          .check-btn {
-            background: $color-background-button;
-          }
-        }
-      }
-    }*/
-    .pay-mask {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 999;
+      z-index: 2000;
       width: 100vw;
       height: 100vh;
     }
