@@ -3,7 +3,8 @@
         :class="[getCartAn === true ? 'goods-show-cart' : 'goods-hide-cart']">
     <!--左侧菜单-->
     <scroll-view class="menu-list-wrapper" :show-scrollbar="showScrollbar"
-                 :scroll-y="scrolly" :scroll-with-animation="scrollAnimation">
+                 :scroll-y="scrolly" :scroll-with-animation="scrollAnimation"
+                 :scroll-top="scrollTop">
       <view class="menu-item" v-for="(menu, index) in menusLeft" :key="index"
             :class="[currentMenuIndex === index ? 'current':'']"
             @tap="selectMenu(menu, index)">
@@ -15,7 +16,7 @@
                  :scroll-into-view="currentGoodId"
                  :show-scrollbar="showScrollbar"
                  :scroll-with-animation="scrollAnimation"
-                 :scroll-y="scrolly">
+                 :scroll-y="scrolly" :scroll-top="scrollTop">
       <view class="goods-list">
         <goods-type :goodType="mergeDishList"></goods-type>
       </view>
@@ -45,7 +46,12 @@
   import {mapGetters, mapActions} from 'vuex';
   import {params} from 'js/config';
   import {errState} from 'js/util'
-  import {timeSlot, menuList, foodsList, dishMeal} from 'js/apiConfig';
+  import {
+    timeSlot,
+    menuList,
+    foodsList,
+    dishMeal
+  } from 'js/apiConfig';
 
   export default {
     data() {
@@ -56,6 +62,7 @@
         dishMealList: [], // 套餐列表数据
         mergeDishList: [], //菜品、套餐接口数据合并
         currentMenuIndex: 0, //左侧菜单
+        scrollTop: 0, // 设置竖向滚动条位置
         currentGoodId: '',  //右侧菜品 id
         showScrollbar: true,  //是否显示滚动条
         scrolly: true,  //允许纵向滚动
@@ -75,7 +82,8 @@
         'getCartGoodsNight',
         'getCartShow',
         'getCartAn',
-        'getShopcartShow'
+        'getShopcartShow',
+        'getMealHint'
       ])
     },
     methods: {
@@ -100,9 +108,6 @@
       // 早中晚接口数据
       _timeSlot() {
         const timeSlotData = Object.assign({}, params, {
-          // 'hospitalId': '8754362990002',
-          // 'deviceMarker': 'KBS888888',
-          // 'category': 1,
           'type': 1
         });
         timeSlot(timeSlotData).then(res => {
@@ -125,8 +130,6 @@
       // 左侧菜单列表数据
       _menuLeft() {
         const menuLeftData = Object.assign({}, params, {
-          // 'hospitalId': '8754362990002',
-          // 'category': 1,
           'dishClassId': this.foodsParams  // 早中晚id
         });
         menuList(menuLeftData).then(res => {
@@ -144,9 +147,6 @@
       // 右侧菜品列表接口请求
       _foodsRight(dishClassId) { // 左侧菜单id
         const foodsRightData = Object.assign({}, params, {
-          // 'hospitalId': '8754362990002',
-          // 'category': 1,
-          // 'deviceMarker': 'KBS888888',
           'pageSize': 100,
           'periodTimeClassId': this.foodsParams, // 早中晚id
           'dishClassId': dishClassId // 左侧菜品id
@@ -154,7 +154,6 @@
         foodsList(foodsRightData).then(res => {
           this.loading = true;
           this.goodsList = res.data.data;
-          // this._dishMeal();  // 套餐接口
           // 接口右侧菜品数据、套餐合并数据
           this.mergeDishList = [this.goodsList, this.dishMealList.dishPackages];
         }).catch(err => {
@@ -166,26 +165,25 @@
       },
       // 套餐接口请求
       _dishMeal() {
-        const dishMealData = Object.assign({}, params,{
-          // 'hospitalId': '8754362990002',
-          // 'deviceMarker': 'KBS888888',
-          // 'category': 1
-        });
+        const dishMealData = Object.assign({}, params, {});
         dishMeal(dishMealData).then(res => {
           this.dishMealList = res.data.data;
-          console.log('套餐', this.dishMealList);
           this.setMerchantInfo(this.dishMealList);
           const _this = this;
-          // setTimeout(() => {
-          //   uni.showModal({
-          //     title: '温馨提示',
-          //     content: _this.dishMealList.hintTitle,
-          //     showCancel: false,
-          //     confirmText: '确 定',
-          //     success: function (res) {
-          //     }
-          //   });
-          // }, 2000);
+          // 未过期，提示只弹框一次
+          if (this.getMealHint === false) {
+            this.setMealHint(true);
+            setTimeout(() => {
+              uni.showModal({
+                title: '温馨提示',
+                content: _this.dishMealList.hintTitle,
+                showCancel: false,
+                confirmText: '确 定',
+                success: function (res) {
+                }
+              });
+            }, 2000);
+          }
         }).catch(err => {
           this.setLoadingState(true);
           // 接口出错提示
@@ -195,6 +193,7 @@
       },
       ...mapActions([
         'setLoadingState',
+        'setMealHint',
         'setTimeSlotData',
         'setMerchantInfo',
         'setLoadingLocal',
@@ -203,6 +202,14 @@
       ])
     },
     watch: {
+      // 减 1的作用：scrollTop值不能定死，否则scroll-view的scroll-top无效
+      getTimeSlot(num) {
+        if (this.scrollTop < 1) {
+          this.scrollTop = this.scrollTop + 0.01;
+        } else {
+          this.scrollTop = 0;
+        }
+      },
       foodsParams() {
         this.loading = false;
         this.currentMenuIndex = 0; //左侧菜单样式重置

@@ -20,7 +20,8 @@
     </view>
     <view class="shopcart-list" :hidden="getShopcartListState"
           :class="[getShopcartShow ? 'shopcart-hide' : 'shopcart-show']">
-      <view class="list-header" :hidden="getShopcartListState" @touchmove.stop.prevent="moveHandle">
+      <view class="list-header" :hidden="getShopcartListState"
+            @touchmove.stop.prevent="moveHandle">
         <text class="title">已选商品</text>
         <view class="empty" @tap="emptyShopcart">
           <text class="clear-iocn"></text>
@@ -140,14 +141,12 @@
         const _self = this;
         // 显示loading组件
         this.setLoadingState(false);
-        uni.navigateTo({
+        uni.reLaunch({
           url: '../../pages/submit-order/submit-order',
           animationDuration: 200,
           success() {
             // 隐藏loading组件
-            setTimeout(() => {
-              _self.setLoadingState(true);
-            }, 2000);
+            _self.setLoadingState(true);
           }
         });
       },

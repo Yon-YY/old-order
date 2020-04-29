@@ -99,15 +99,15 @@
     computed: {
       // 是否可下单点餐
       isReserveShow() {
-        // const merchantInfo = this.getMerchantInfo;
-        const merchantInfo = {
-          businessDinnerEndTime: "15:00",
-          businessDinnerStartTime: "",
-          businessLunchEndTime: "",
-          businessLunchStartTime: "08:00",
-          singleMode: 2,
-          stoppingOrder: 0
-        };
+        const merchantInfo = this.getMerchantInfo;
+        // const merchantInfo = {
+        //   businessDinnerEndTime: "15:00",
+        //   businessDinnerStartTime: "",
+        //   businessLunchEndTime: "",
+        //   businessLunchStartTime: "08:00",
+        //   singleMode: 2,
+        //   stoppingOrder: 0
+        // };
         // 时间个位数时前面补0 zeroize
         const systemDate = `${zeroize(new Date().getHours())}:${zeroize(new Date().getMinutes())}`;
         // stoppingOrder(0 接单, 1停止接单)

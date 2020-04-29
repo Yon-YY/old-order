@@ -1,5 +1,9 @@
 <template>
   <view class="submit-order">
+    <view class="desc-state-text">
+      <text class="back-home-icon" @tap="home"></text>
+      <text class="back-home-text" @tap="home">首页</text>
+    </view>
     <view class="address-view">
       <view class="address-input" @tap="editAddress">
         <text class="address-phone-text">{{_addressTips}}</text>
@@ -116,28 +120,33 @@
       <text class="payment-btn" @tap="confirmPayment">确认支付</text>
     </view>
     <!--订单提交成功弹框-->
-    <view class="order-success-wrap" :hidden="orderSuccess">
-      <layer
-          :class="[orderSuccess === true ? 'close-layer-an' : 'open-layer-an']">
-        <view class="success-layer-main">
-          <text class="success-icon"></text>
-          <text class="success-text">订单提交成功！</text>
-          <view class="success-button-wrap">
-            <text class="success-btn home-btn" @tap="backHome">返回首页</text>
-            <text class="success-btn check-btn" @tap="checkOrder">订单详情</text>
-          </view>
-        </view>
-      </layer>
+    <view :hidden="orderSuccess">
+      <success-layer class="success-layer-box" :isHidden="orderSuccess"
+                     @checkOrder="checkOrder"></success-layer>
     </view>
-    <view class="pay-mask" :hidden="payState"></view>
+    <!--    <view class="order-success-wrap" :hidden="orderSuccess">-->
+    <!--      <layer-->
+    <!--          :class="[orderSuccess === true ? 'close-layer-an' : 'open-layer-an']">-->
+    <!--        <view class="success-layer-main">-->
+    <!--          <text class="success-icon"></text>-->
+    <!--          <text class="success-text">订单提交成功！</text>-->
+    <!--          <view class="success-button-wrap">-->
+    <!--            <text class="success-btn home-btn" @tap="backHome">返回首页</text>-->
+    <!--            <text class="success-btn check-btn" @tap="checkOrder">订单详情</text>-->
+    <!--          </view>-->
+    <!--        </view>-->
+    <!--      </layer>-->
+    <!--    </view>-->
+    <view class="pay-mask" :hidden="payState" @tap="toPay"></view>
   </view>
 </template>
 
 <script type="text/ecmascript-6">
   import OrderFoodlist from 'components/order-foodlist/order-foodlist';
   import Layer from 'components/layer/layer';
+  import SuccessLayer from 'components/success-layer/success-layer';
   import {mapGetters, mapActions} from 'vuex';
-  import {validatePhone, showToast} from 'js/util';
+  import {validatePhone, showToast, overdueRemind} from 'js/util';
   import {params} from 'js/config';
   import {
     addressDefault,
@@ -172,6 +181,35 @@
       };
     },
     methods: {
+      // 返回首页
+      home() {
+        const _this = this;
+        uni.showModal({
+          title: '温馨提示',
+          content: '是否离开此页面返回首页？',
+          cancelText: '否',
+          confirmText: '是',
+          success: function (res) {
+            if (res.confirm) {
+              uni.showLoading({
+                title: '正在加载...',
+                mask: true
+              });
+              setTimeout(() => {
+                uni.reLaunch({
+                  url: '../../pages/index/index',
+                  success() {
+                    uni.hideLoading();
+                    _this.setTabBarState([0, false]);
+                  }
+                });
+              }, 500);
+            } else if (res.cancel) {
+              console.log('用户点击否');
+            }
+          }
+        });
+      },
       // 遮罩
       clickMask() {
         showToast('none', '网络开小差，请稍后', 1500);
@@ -257,23 +295,24 @@
           const entTime = JSON.parse(uni.getStorageSync('userInfo')).entTime;
           if (entTime < new Date().getTime()) {
             console.log('登录已过期');
-            uni.showModal({
-              title: '温馨提示',
-              content: '用户尚未登录或登录已过期，是否重新登录',
-              cancelText: '否',
-              confirmText: '是',
-              success: function (res) {
-                if (res.confirm) {
-                  uni.setStorageSync('isCanUser', true); // 设置登录状态
-                  uni.reLaunch({
-                    url: '../../pages/login/login',
-                    animationType: 'none'
-                  });
-                } else if (res.cancel) {
-                  console.log('用户点击取消');
-                }
-              }
-            });
+            overdueRemind();
+            // uni.showModal({
+            //   title: '温馨提示',
+            //   content: '用户尚未登录或登录已过期，是否重新登录',
+            //   cancelText: '否',
+            //   confirmText: '是',
+            //   success: function (res) {
+            //     if (res.confirm) {
+            //       uni.setStorageSync('isCanUser', true); // 设置登录状态
+            //       uni.reLaunch({
+            //         url: '../../pages/login/login',
+            //         animationType: 'none'
+            //       });
+            //     } else if (res.cancel) {
+            //       console.log('用户点击取消');
+            //     }
+            //   }
+            // });
           } else {
             console.log('登录未过期');
             if (this.addressText === '' || this.addressName === '') {
@@ -322,16 +361,21 @@
             // 缓存总金额，传到查看订单详情
             uni.setStorageSync('payAmount', this._totalPrice);
             // 提交订单支付
+            let remarkStr = '';
+            if (this.valRemarksText === '') {
+              remarkStr = this.checkCont.toString();
+            } else {
+              if (this.checkCont.toString() === '') {
+                remarkStr = this.valRemarksText;
+              } else {
+                remarkStr = `${this.checkCont.toString()},${this.valRemarksText}`;
+              }
+            }
             const openId = JSON.parse(uni.getStorageSync('userInfo')).openId;
             const mergeParam = Object.assign({}, {dishList: merge}, params);
             setTimeout(() => {
               const submitData = Object.assign({}, mergeParam, {
-                // hospitalId: '8754362990002',
-                // deviceMarker: 'KBS888888',
-                // deviceId: '0', // 小程序为空
-                // category: 1,
-                // appType: 2, // 2 为微信小程序
-                remark: this.valRemarksText === '' ? this.checkCont.toString() : `${this.checkCont.toString()},${this.valRemarksText}`, // 备注, // 备注
+                remark: remarkStr, // 备注
                 orderAddress: this.addressText,
                 phone: this.addressPhone,
                 userId: uni.getStorageSync('userId'),
@@ -348,24 +392,25 @@
                 console.log('成功', res);
                 const payData = res.data.data;
                 uni.setStorageSync('orderNo', payData.orderNo);
+                // 缓存支付信息，用于再次支付
                 uni.requestPayment({
                   provider: 'wxpay',
+                  signType: 'MD5',
                   orderInfo: JSON.stringify(submitData),
                   timeStamp: payData.timeStamp,
                   nonceStr: payData.nonceStr,
                   package: payData.package,
-                  signType: 'MD5',
                   paySign: payData.paySign,
                   success: function (res) {
                     _this.orderSuccess = false;
                     _this.payState = true;
+                    // 隐藏购物车
+                    _this.setCartShow(true);
+                    _this.setCartAn(false);
+                    // 订单提交成功，清空购物车
+                    _this.clearShopcart();
                     console.log('success:' + JSON.stringify(res));
                     const stateData = Object.assign({}, params, {
-                      // hospitalId: '8754362990002',
-                      // deviceMarker: 'KBS888888',
-                      // category: 1,
-                      // appType: 2,
-                      // orderPayType: 2, //支付方式 1 支付宝 2 微信 3 现金支付
                       orderNo: payData.orderNo
                     });
                     orderStatus(stateData).then(state => {
@@ -375,34 +420,23 @@
                     });
                   },
                   fail: function (err) {  // 取消支付
-                    const cancelData = {
-                      orderId: payData.orderId,
-                      orderType: 1,
-                      deviceMarker: 'KBS888888',
-                      category: 1
+                    const payParams = {
+                      provider: 'wxpay',
+                      signType: 'MD5',
+                      orderInfo: JSON.stringify(submitData),
+                      timeStamp: payData.timeStamp,
+                      nonceStr: payData.nonceStr,
+                      package: payData.package,
+                      paySign: payData.paySign,
+                      orderNo: payData.orderNo
+                    };
+                    try {
+                      uni.setStorageSync('payParams', payParams);
+                      // 缓存详情继续支付需要参数
+                      uni.setStorageSync('submitData', JSON.stringify(submitData));
+                    } catch (e) {
+                      // error
                     }
-                    uni.showLoading({
-                      title: '正在取消订单'
-                    });
-                    cancelOrder(cancelData).then(cancelResult => {
-                      uni.hideLoading();
-                      console.log('取消', cancelResult);
-                      uni.showToast({
-                        title: '订单取消成功',
-                        duration: 1000,
-                        success: function (res) {
-                          setTimeout(() => {
-                            // 跳转后清空购物车
-                            _this.clearShopcart();
-                            uni.reLaunch({
-                              url: '../../pages/index/index'
-                            });
-                          }, 2000);
-                        }
-                      });
-                    }).catch(err => {
-                      console.log(`https://segmentfault.com/search?q=${err}`);
-                    });
                     console.log('fail:' + JSON.stringify(err));
                   }
                 });
@@ -412,6 +446,66 @@
             }, 50);
           }
         }
+      },
+      toPay() {
+        const _this = this;
+        uni.showModal({
+          title: '温馨提示',
+          content: '该订单已有未支付，是否前往支付？',
+          cancelText: '否',
+          confirmText: '是',
+          success: function (res) {
+            if (res.confirm) {
+              uni.showLoading({
+                title: '前往支付...',
+                mask: true
+              });
+              setTimeout(() => {
+                // 跳转后清空购物车
+                _this.clearShopcart();
+                uni.reLaunch({
+                  url: '../../pages/index/index',
+                  success: function (res) {
+                    uni.hideLoading();
+                    _this.setTabBarState([1, true]);
+                  }
+                });
+              }, 500);
+            } else if (res.cancel) {
+              uni.showModal({
+                title: '温馨提示',
+                content: '您确定要放弃支付该订单吗？',
+                cancelText: '取 消',
+                confirmText: '确 定',
+                success: function (res) {
+                  if (res.confirm) {
+                    uni.showLoading({
+                      title: '加载中...',
+                      mask: true
+                    });
+                    setTimeout(() => {
+                      // 跳转后清空购物车
+                      _this.clearShopcart();
+                      uni.reLaunch({
+                        url: '../../pages/index/index',
+                        success: function (cancel) {
+                          uni.hideLoading();
+                          // 隐藏购物车
+                          _this.setCartShow(true);
+                          _this.setCartAn(false);
+                          _this.setTabBarState([0, false]);
+                        }
+                      });
+                    }, 500);
+                  } else if (res.cancel) {
+                    console.log('用户点击取消');
+                  }
+                }
+              });
+              console.log('用户点击否');
+            }
+          }
+        });
       },
       clearShopcart() {
         // 设置购物车动画
@@ -423,32 +517,43 @@
         this.setCartGoodsNight([]);
       },
       // 返回首页
-      backHome() {
-        // 跳转后初始化，清空购物车
-        this.clearShopcart();
-        uni.reLaunch({
-          url: '../../pages/index/index',
-          animationType: 'none'
-        });
-      },
+      // backHome() {
+      //   // 跳转后初始化，清空购物车
+      //   this.clearShopcart();
+      //   uni.reLaunch({
+      //     url: '../../pages/index/index'
+      //   });
+      // },
       // 查看成功提交的订单详情
       checkOrder() {
         // 跳转后初始化，清空购物车
-        this.clearShopcart();
         this.orderSuccess = true;
-        const itemVal = encodeURIComponent(JSON.stringify(this.submitData));
-        uni.reLaunch({
-          url: `../../components/order-success/order-success?item=${itemVal}`,
-          animationType: 'none'
+        uni.showLoading({
+          title: '正在加载...',
+          mask: true
         });
+        try {
+          const itemVal = encodeURIComponent(JSON.stringify(uni.getStorageSync('submitData')));
+          setTimeout(() => {
+            uni.reLaunch({
+              url: `../../components/order-success/order-success?item=${itemVal}`,
+              success: function () {
+                uni.hideLoading();
+              }
+            });
+          }, 1000);
+        } catch (e) {
+        }
       },
       ...mapActions([
         'setShopcartListState',
+        'setTabBarState',
         'setCartGoodsMorning',
         'setCartGoodsNoon',
         'setCartGoodsNight',
-        'setShopcartListState',
-        'setShopcartShow'
+        'setShopcartShow',
+        'setCartAn',
+        'setCartShow'
       ])
     },
     watch: {
@@ -472,6 +577,7 @@
         return this.foodsList = goodsContcat;
       },
       _totalPrice() {
+        // 总金额
         let total = 0;
         this._foodsList.forEach(food => {
           total += food.price * food.sumCount;
@@ -526,13 +632,48 @@
     },
     components: {
       OrderFoodlist,
-      Layer
+      Layer,
+      SuccessLayer
+    },
+    onLoad() {
+      // 隐藏左上角返回首页按钮
+      uni.hideHomeButton();
+    },
+    onShow() {
+      // 隐藏左上角返回首页按钮
+      uni.hideHomeButton();
     }
   };
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" type="text/stylus" scoped>
   .submit-order {
+    .desc-state-text {
+      position: fixed;
+      top: 35%;
+      right: 20rpx;
+      z-index: 888;
+      padding: 7rpx;
+      width: 70rpx;
+      height: 70rpx;
+      border-radius: 50%;
+      color: $color-background-button;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.3);
+      .back-home-icon {
+        margin: 8rpx auto 0 auto;
+        width: 36rpx;
+        height: 30rpx;
+        background: url('../../static/img/home-currt.png') no-repeat;
+        background-size: cover;
+      }
+      .back-home-text {
+        display: flex;
+        justify-content: center;
+        padding-top: 10rpx;
+        font-size: $font-size22;
+      }
+    }
     padding: 32rpx 0 96rpx 0;
     min-height: calc(100vh - 128rpx);
     background: $color-button-text;
@@ -553,7 +694,6 @@
       }
     }
     .address-view {
-      /*position: relative;*/
       padding: 0 40rpx;
       border-bottom: 16rpx $color-background solid;
       .address-input {
@@ -731,7 +871,26 @@
         background: $color-background-button;
       }
     }
-    .order-success-wrap {
+    .success-layer-box {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 999;
+      width: 100vw;
+      height: 100vh;
+      background: $color-dialog-background;
+    }
+    /*.success-layer-box::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 999;
+      width: 100vw;
+      height: 100vh;
+      background: $color-dialog-background;
+    }*/
+    /*.order-success-wrap {
       .success-layer-main {
         width: 100%;
         height: 100%;
@@ -767,14 +926,14 @@
           }
         }
       }
-    }
+    }*/
     .pay-mask {
       position: absolute;
       top: 0;
       left: 0;
       z-index: 999;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
     }
   }
 </style>

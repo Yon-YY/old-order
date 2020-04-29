@@ -7,6 +7,8 @@ export default new Vuex.Store({
   state: {
     loadingState: false,  // loading组件
     loadingLocal: false, // 局部loading组件
+    tabBarState: [0, false], // 底部tabBar状态
+    mealHint: false,  // 提示送餐规则
     timeSlotData: [], // 早中晚数据
     timeSlot: 1, // 早餐：1、中餐：2、晚餐：3（默认早餐：1)
     merchantInfo: {}, // 商家信息
@@ -22,7 +24,8 @@ export default new Vuex.Store({
     cartAn: false, // 购物车动画
     shopcartListState: true, // 购物车中的菜品列表状态
     shopcartShow: true, // 购物车中菜品列表动画状态
-    formatListDetails: [] // 菜品套餐列表详情
+    formatListDetails: [], // 菜品套餐列表详情
+    monitor: false // 监听倒计时定时器是否已停止, 默认false未停止
   },
   mutations: {
     SET_LOADING_STATE(state, loadingState) {
@@ -30,6 +33,12 @@ export default new Vuex.Store({
     },
     SET_LOADING_LOCAL(state, loadingLocal) {
       state.loadingLocal = loadingLocal;
+    },
+    SET_TAB_BAR_STATE(state, tabBarState) {
+      state.tabBarState = tabBarState;
+    },
+    SET_MEAL_HINT(state, mealHint) {
+      state.mealHint = mealHint;
     },
     SET_TIME_SLOT_DATA(state, timeSlotData) {
       state.timeSlotData = timeSlotData;
@@ -204,11 +213,16 @@ export default new Vuex.Store({
     },
     SET_FORMAT_LIST(state, formatListDetails) {
       state.formatListDetails = formatListDetails;
+    },
+    SET_MONITOR(state, monitor) {
+      state.monitor = monitor;
     }
   },
   getters: {
     getLoadingState: state => state.loadingState,
     getLoadingLocal: state => state.loadingLocal,
+    getTabBarState: state => state.tabBarState,
+    getMealHint: state => state.mealHint,
     getTimeSlotData: state => state.timeSlotData,
     getTimeSlot: state => state.timeSlot,
     getMerchantInfo: state => state.merchantInfo,
@@ -230,7 +244,8 @@ export default new Vuex.Store({
     getCartAn: state => state.cartAn,
     getShopcartListState: state => state.shopcartListState,
     getShopcartShow: state => state.shopcartShow,
-    getFormatListDetails: state => state.formatListDetails
+    getFormatListDetails: state => state.formatListDetails,
+    getMonitor: state => state.monitor
   },
   actions: {
     setLoadingState({commit}, loadingState) {
@@ -238,6 +253,12 @@ export default new Vuex.Store({
     },
     setLoadingLocal({commit}, loadingLocal) {
       commit('SET_LOADING_LOCAL', loadingLocal);
+    },
+    setTabBarState({commit}, tabBarState) {
+      commit('SET_TAB_BAR_STATE', tabBarState);
+    },
+    setMealHint({commit}, mealHint) {
+      commit('SET_MEAL_HINT', mealHint);
     },
     setTimeSlotData({commit}, timeSlotData) {
       commit('SET_TIME_SLOT_DATA', timeSlotData);
@@ -289,6 +310,9 @@ export default new Vuex.Store({
     },
     setFormatListDetails({commit}, formatListDetails) {
       commit('SET_FORMAT_LIST', formatListDetails);
+    },
+    setMonitor({commit}, monitor) {
+      commit('SET_MONITOR', monitor);
     }
   }
 });

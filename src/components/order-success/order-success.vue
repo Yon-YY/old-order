@@ -39,7 +39,7 @@
       </view>
       <view class="desc-item">
         <text class="desc-left">订单备注</text>
-        <text class="desc-right">{{remarks}}</text>
+        <text class="desc-right">{{orderReceived.remark}}</text>
       </view>
     </view>
     <!--Loading组件-->
@@ -76,9 +76,9 @@
         setTimeout(() => {
           uni.reLaunch({
             url: '../../pages/index/index',
-            animationType: 'none',
             success() {
               _this.loading = true;
+              _this.setTabBarState([0, false]);
             }
           }, 1000);
         });
@@ -89,11 +89,7 @@
         });
       },
       ...mapActions([
-        'setCartGoodsMorning',
-        'setCartGoodsNoon',
-        'setCartGoodsNight',
-        'setShopcartListState',
-        'setShopcartShow'
+        'setTabBarState'
       ])
     },
     computed: {
@@ -110,8 +106,6 @@
       uni.hideHomeButton();
       // 接收上一个页面传入的对象
       this.orderReceived = JSON.parse(decodeURIComponent(params.item));
-      const remarkStr = this.orderReceived.remark;
-      this.remarks = remarkStr.substring(0, remarkStr.lastIndexOf(','));
     },
     onShow() {
       // 隐藏左上角返回首页按钮
@@ -164,6 +158,7 @@
         margin-bottom: 40rpx;
         font-size: $font-size24;
         .left-text, .desc-left {
+          line-height: 36rpx;
           color: $color-theme;
         }
         .right-text, .desc-right {

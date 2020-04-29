@@ -2,10 +2,10 @@
   <view class="tab-bar-wrapper">
     <view class="tab-box" v-for="(menu, index) in menuTexts"
           @click="menuCurrt(index)"
-          :class="[tabCurrt === index ?'tab-box-currt':'']"
+          :class="[iconCurrtIndex === index ?'tab-box-currt':'']"
           :key="index">
       <text class="icon"
-            :class="[iconCurrt === index ?'icon-currt':'icon-default']"></text>
+            :class="[iconCurrtIndex === index ?'icon-currt':'icon-default']"></text>
       <text class="text">{{menu}}</text>
     </view>
   </view>
@@ -13,17 +13,23 @@
 
 <script type="text/ecmascript-6">
   export default {
+    props: {
+      iconCurrt: {
+        type: Number,
+        detail: 0
+      }
+    },
     data() {
       return {
         menuTexts: ['首页', '订单'],
-        tabCurrt: 0,
-        iconCurrt: 0
+        // tabCurrt: 0,
+        iconCurrtIndex: this.iconCurrt
       }
     },
     methods: {
       menuCurrt(index) {
-        this.tabCurrt = index;
-        this.iconCurrt = index;
+        this.iconCurrtIndex = index;
+        // this.iconCurrtIndex[1] = index;
         this.$emit('tabBarIndex', index);
       }
     }

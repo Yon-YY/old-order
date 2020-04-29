@@ -14,6 +14,27 @@ export const validatePhone = value => {
   }
 }
 
+// 授权过期提示
+export function overdueRemind() {
+  uni.showModal({
+    title: '温馨提示',
+    content: '用户尚未登录或登录已过期，是否重新登录',
+    cancelText: '否',
+    confirmText: '是',
+    success: function (res) {
+      if (res.confirm) {
+        uni.setStorageSync('isCanUser', true); // 设置登录状态
+        uni.reLaunch({
+          url: '../../pages/login/login',
+          animationType: 'none'
+        });
+      } else if (res.cancel) {
+        console.log('用户点击取消');
+      }
+    }
+  });
+}
+
 // 信息提示
 export const showToast = (icon, title, time) => uni.showToast({
   icon: isEmpty(icon) ? 'none' : icon,
@@ -23,7 +44,7 @@ export const showToast = (icon, title, time) => uni.showToast({
 });
 
 // 接口出错提示
-export function errState(text='服务崩溃啦~'){
+export function errState(text = '服务崩溃啦~') {
   uni.showLoading({
     title: text,
     mask: true
@@ -52,6 +73,11 @@ export function timeStampDate(timeStamp, type) {
     default:
       return year + '-' + zeroize(month) + '-' + zeroize(date) + ' ' + zeroize(hours) + ':' + zeroize(minutes) + ':' + zeroize(seconds);
   }
+}
+
+// 时间戳转分
+function a() {
+  seconds = (time % (1000 * 60)) / 1000;
 }
 
 // 月份、日期、时间补零

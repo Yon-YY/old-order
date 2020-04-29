@@ -43,16 +43,30 @@
       </view>
       <view class="desc-item">
         <text class="desc-left">订单备注</text>
-        <text class="desc-right">{{remarks}}</text>
+        <text class="desc-right">{{orderDetails.remark}}</text>
       </view>
-      <text class="cancel-order"
-            v-if="orderDetails.orderPayType === 3 || orderDetails.orderType === 1 || orderDetails.orderType === 3 || orderDetails.orderType === 4"
-            @tap="cancelOrderTap">取消订单
-      </text>
-      <text class="refund" @tap="refund"
-            v-if="orderDetails.orderType === 4 || orderDetails.orderType === 5 || orderDetails.orderType === 6 || orderDetails.orderType === 10 || orderDetails.orderType === 11">
-        退款
-      </text>
+      <block>
+        <view class="btn-main" v-if="monitorState === false">
+          <view class="pay-remind-main" v-if="orderDetails.orderType === 1">
+            <text class="remind-title">订单剩余支付时间</text>
+            <count-down class="count-down"
+                        :endTime="orderReceived.orderValidPayTime"></count-down>
+            <text class="remind-text">{{_stampMinute}}分钟内未支付，订单将自动取消</text>
+          </view>
+          <text class="order-btn cancel-order"
+                v-if="orderDetails.orderPayType === 3 || orderDetails.orderType === 1 || orderDetails.orderType === 3 || orderDetails.orderType === 4"
+                @tap="cancelOrderTap">取消订单
+          </text>
+          <text class="order-btn continue-pay"
+                v-if="orderDetails.orderType === 1" @tap="continuePay">继续支付
+          </text>
+          <!--退款不需要添加状态4，状态4逻辑直接在取消订单执行-->
+          <text class="order-btn refund" @tap="refund"
+                v-if="orderDetails.orderType === 5 || orderDetails.orderType === 6 || orderDetails.orderType === 10 || orderDetails.orderType === 11">
+            退款
+          </text>
+        </view>
+      </block>
       <view class="layer-wrap" :hidden="applyNotes">
         <layer
             :class="[applyNotes === true ? 'close-layer-an' : 'open-layer-an']">
@@ -97,17 +111,25 @@
         </layer>
       </view>
     </view>
+    <!--订单提交成功弹框-->
+    <view :hidden="orderSuccess" @touchmove.stop.prevent="moveHandle">
+      <success-layer class="success-layer-box" :isHidden="orderSuccess"
+                     @checkOrder="checkOrder"></success-layer>
+    </view>
   </view>
 </template>
 
 <script type="text/ecmascript-6">
   import OrderFoodlist from '../order-foodlist/order-foodlist';
+  import CountDown from '../count-down/count-down';
+  import SuccessLayer from 'components/success-layer/success-layer';
   import {mapGetters, mapActions} from 'vuex';
-  import {showToast, timeStampDate} from 'js/util';
+  import {showToast, timeStampDate, overdueRemind} from 'js/util';
   import {device, params} from 'js/config';
   import {
     orderDetailsRefund,
     cancelOrder,
+    orderStatus,
     refundExplain,
     orderRefund
   } from 'js/apiConfig';
@@ -128,6 +150,8 @@
         desc: '', // 退款说明
         targetNum: 100, // 最多可输入字数
         remnant: 100, // 倒计数
+        monitorState: false, // 订单失效状态 false 未失效
+        orderSuccess: true, // 订单提交成功弹框
       };
     },
     methods: {
@@ -136,8 +160,78 @@
           phoneNumber: this._merchantPhone
         });
       },
+      // 继续支付
+      continuePay() {
+        const _this = this;
+        if (uni.getStorageSync('userInfo')) {
+          const entTime = JSON.parse(uni.getStorageSync('userInfo')).entTime;
+          if (entTime < new Date().getTime()) {
+            console.log('登录已过期');
+            overdueRemind();
+          } else {
+            if (uni.getStorageSync('payParams')) {
+              const payData = uni.getStorageSync('payParams');
+              uni.requestPayment({
+                provider: 'wxpay',
+                signType: 'MD5',
+                orderInfo: payData.orderInfo,
+                timeStamp: payData.timeStamp,
+                nonceStr: payData.nonceStr,
+                package: payData.package,
+                paySign: payData.paySign,
+                success: function (res) {
+                  _this.orderSuccess = false;
+                  // 订单提交成功，清空购物车
+                  _this.clearShopcart();
+                  const stateData = Object.assign({}, params, {
+                    orderNo: payData.orderNo
+                  });
+                  orderStatus(stateData).then(state => {
+                    console.log('状态', state);
+                  }).catch(err => {
+                    console.log(`https://segmentfault.com/search?q=${err}`);
+                  });
+                  console.log('success:' + JSON.stringify(res));
+                },
+                fail: function (err) { // 取消支付
+                  console.log('fail:' + JSON.stringify(err));
+                }
+              });
+            }
+          }
+        }
+      },
       // 取消订单
       cancelOrderTap() {
+        this._cancelOrder('active');
+      },
+      // 支付成功后查看提交的订单
+      checkOrder() {
+        // 跳转后初始化，清空购物车
+        const _this = this;
+        this.orderSuccess = true;
+        uni.showLoading({
+          title: '正在加载...',
+          mask: true
+        });
+        try {
+          const itemVal = encodeURIComponent(uni.getStorageSync('submitData'));
+          console.log('详情', uni.getStorageSync('submitData'));
+          setTimeout(() => {
+            uni.reLaunch({
+              url: `../../components/order-success/order-success?item=${itemVal}`,
+              success: function () {
+                uni.hideLoading();
+              }
+            });
+          }, 1000);
+        } catch (e) {
+        }
+      },
+      moveHandle() {
+        return false;
+      },
+      _cancelOrder(type) {
         const _this = this;
         const cancelData = Object.assign({}, params, {
           // deviceMarker: 'KBS888888',
@@ -145,43 +239,58 @@
           // appType: 2,
           orderId: this.orderReceived.orderId,
           orderType: this.orderReceived.orderType
-
         });
-        uni.showModal({
-          title: '温馨提示',
-          content: '您确定取消该订单？',
-          cancelText: '取 消',
-          confirmText: '确 定',
-          success: function (res) {
-            if (res.confirm) {
-              uni.showLoading({
-                title: '正在取消订单',
-                mask: true
-              });
-              cancelOrder(cancelData).then(cancelResult => {
-                uni.hideLoading();
-                console.log('取消', cancelResult);
-                uni.showToast({
-                  title: '订单取消成功',
-                  duration: 2000,
-                  success: function (res) {
-                    setTimeout(() => {
-                      // 跳转后清空购物车
-                      _this.clearShopcart();
-                      uni.reLaunch({
-                        url: '../../pages/index/index'
-                      });
-                    }, 2500);
-                  }
+        if (type === 'active') { // 用户主动取消订单
+          uni.showModal({
+            title: '温馨提示',
+            content: '您确定要取消该订单吗？',
+            cancelText: '取 消',
+            confirmText: '确 定',
+            success: function (res) {
+              if (res.confirm) {
+                uni.showLoading({
+                  title: '正在取消订单',
+                  mask: true
                 });
-              }).catch(err => {
-                console.log(`https://segmentfault.com/search?q=${err}`);
-              });
-            } else if (res.cancel) {
-              console.log('用户点击取消');
+                cancelOrder(cancelData).then(cancelResult => {
+                  uni.hideLoading();
+                  console.log('取消', cancelResult);
+                  if (cancelResult.data.code === '200') {
+                    uni.showToast({
+                      title: '订单取消成功',
+                      duration: 2000,
+                      success: function (res) {
+                        setTimeout(() => {
+                          // 跳转后清空购物车
+                          _this.clearShopcart();
+                          uni.reLaunch({
+                            url: '../../pages/index/index'
+                          });
+                        }, 2800);
+                      }
+                    });
+                  } else {
+                    uni.showToast({
+                      title: '订单取消失败',
+                      icon: 'none',
+                      duration: 3000
+                    });
+                  }
+                }).catch(err => {
+                  console.log(`https://segmentfault.com/search?q=${err}`);
+                });
+              } else if (res.cancel) {
+                console.log('用户点击取消');
+              }
             }
-          }
-        });
+          });
+        } else { // 未支付自动取消订单
+          cancelOrder(cancelData).then(cancel => {
+            console.log('用户未支付，订单自动取消', cancel);
+          }).catch(err => {
+            console.log(`https://segmentfault.com/search?q=${err}`);
+          });
+        }
       },
       refund() {
         this.applyNotes = false;
@@ -262,13 +371,27 @@
       },
       ...mapActions([
         'setShopcartListState',
+        'setTabBarState',
         'setCartGoodsMorning',
         'setCartGoodsNoon',
         'setCartGoodsNight',
         'setShopcartShow'
       ])
     },
+    watch: {
+      getMonitor(tmp) {
+        // 用户未支付，支付时间过期自动取消订单
+        if (tmp === true) {
+          this.monitorState = true;
+          this._cancelOrder();
+        }
+      }
+    },
     computed: {
+      // 时间戳转分钟
+      _stampMinute() {
+        return parseInt(((this.orderReceived.orderValidPayTime - new Date().getTime()) % (1000 * 60 * 60)) / (1000 * 60)) + 1;
+      },
       _merchantPhone() {
         return this.getMerchantInfo.merchantPhone;
       },
@@ -284,7 +407,8 @@
         }
       },
       ...mapGetters([
-        'getMerchantInfo'
+        'getMerchantInfo',
+        'getMonitor'
       ])
     },
     onLoad(params) {
@@ -307,16 +431,15 @@
         // 订单详情
         orderDetailsRefund(refundData).then(res => {
           this.orderDetails = res.data.data;
-          // 备注截取最后一个逗号
-          const remarkStr = this.orderDetails.remark;
-          this.remarks = remarkStr.substring(0, remarkStr.lastIndexOf(','));
         }).catch(err => {
           console.log(`https://segmentfault.com/search?q=${err}`);
         });
       }
     },
     components: {
-      OrderFoodlist
+      OrderFoodlist,
+      SuccessLayer,
+      CountDown
     }
   };
 </script>
@@ -363,6 +486,7 @@
         margin-bottom: 40rpx;
         font-size: $font-size24;
         .left-text, .desc-left {
+          line-height: 36rpx;
           color: $color-theme;
         }
         .right-text, .desc-right {
@@ -384,25 +508,62 @@
           background-size: cover;
         }
       }
-      .cancel-order {
-        margin: 160rpx auto 0 auto;
-        width: 66%;
-        line-height: 56rpx;
-        color: $color-theme;
-        text-align: center;
-        border: 1px solid #e4e7ed;
-        border-radius: 5px;
-        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-      }
-      .refund {
-        margin-top: 160rpx;
-        width: 110rpx;
-        line-height: 48rpx;
-        color: $color-theme;
-        text-align: center;
-        border: 1px solid #e4e7ed;
-        border-radius: 5px;
-        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+      .btn-main {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        border-top: #f5f7fa 1px solid;
+        box-shadow: 0 6px 12px -6px rgba(0, 0, 0, 0.1);
+        .pay-remind-main {
+          padding: 30rpx 0 30rpx 0;
+          margin: 50rpx auto 0 auto;
+          width: 90%;
+          border-bottom: #f5f7fa 1px solid;
+          .remind-title {
+            text-align: center;
+            color: $color-theme-b;
+            font-size: $font-size32;
+            font-weight: $font-weight-b;
+          }
+          .count-down {
+            padding: 30rpx 0;
+            text-align: center;
+            font-size: $font-size28;
+            color: $color-circular-background;
+          }
+          .remind-text {
+            text-align: center;
+            color: $color-input-placeholder;
+            font-size: $font-size26;
+          }
+        }
+        .order-btn {
+          flex: 1;
+          margin: 50rpx 20rpx;
+          width: 40%;
+          line-height: 56rpx;
+          text-align: center;
+          border-radius: 5px;
+          box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+        .continue-pay {
+          color: $color-button-text;
+          border: 1px solid $color-background-button;
+          background: $color-background-button;
+        }
+        .cancel-order {
+          color: $color-theme;
+          border: 1px solid #e4e7ed;
+        }
+        .refund {
+          margin: 70rpx auto 0 auto;
+          width: 100%;
+          color: $color-theme;
+          text-align: center;
+          border: 1px solid #e4e7ed;
+          border-radius: 5px;
+          box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
       }
       .apply-notes-main {
         width: 80%;
@@ -530,6 +691,15 @@
     }
     .desc-message-wrap {
       margin-bottom: 40rpx;
+    }
+    .success-layer-box {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 999;
+      width: 100vw;
+      height: 100vh;
+      background: $color-dialog-background;
     }
   }
   .select-show {

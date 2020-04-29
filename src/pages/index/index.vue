@@ -2,9 +2,12 @@
   <view class="index-wrap">
     <view class="notify-mask" :hidden="notifyShow"
           @tap="hideNotify"></view>
-    <view class="news-wrap" :class="[tabBarState === false ? 'heightShow' : 'heightHide']"
+    <view class="news-wrap"
+          :class="[getTabBarState[1] === false ? 'heightShow' : 'heightHide']"
           @tap="showNotify">
-      <view class="news-notify" :class="[notifyShow === true ? 'notify-hide' : 'notify-show' ]" @tap.stop="hideNotify">
+      <view class="news-notify"
+            :class="[notifyShow === true ? 'notify-hide' : 'notify-show' ]"
+            @tap.stop="hideNotify">
         <text class="notify-text">
           {{notifyText}}
         </text>
@@ -13,17 +16,18 @@
                       :text="notifyText"/>
       <text class="news-icon"></text>
     </view>
-    <view class="header-content-wrap" :hidden="tabBarState">
+    <view class="header-content-wrap" :hidden="getTabBarState[1]">
       <uni-header></uni-header>
       <goods></goods>
     </view>
     <!--订单-->
-    <view v-if="tabBarState">
+    <view v-if="getTabBarState[1]">
       <order-list class="order-main"></order-list>
     </view>
     <!--底部Tab-->
     <view class="tab-bar-wrapper">
-      <tab-bar @tabBarIndex="tabBarIndex"></tab-bar>
+      <tab-bar :iconCurrt="getTabBarState[0]"
+               @tabBarIndex="tabBarIndex"></tab-bar>
     </view>
     <!--套餐选择菜品弹框-->
     <view class="foods-format-wrap" :hidden="getFormatWrapState">
@@ -52,7 +56,6 @@
   export default {
     data() {
       return {
-        tabBarState: false,
         notifyShow: true
       }
     },
@@ -65,13 +68,14 @@
       },
       tabBarIndex(index) {
         if (index === 0) {
-          this.tabBarState = false;
+          this.setTabBarState([0, false]);
         } else {
-          this.tabBarState = true;
+          this.setTabBarState([1, true]);
         }
       },
       ...mapActions([
-        'setLoadingState'
+        'setLoadingState',
+        'setTabBarState'
       ])
     },
     computed: {
@@ -84,6 +88,7 @@
       },
       ...mapGetters([
         'getLoadingState',
+        'getTabBarState',
         'getMerchantInfo',
         'getFormatWrapState'
       ])
