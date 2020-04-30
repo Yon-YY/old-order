@@ -1,5 +1,5 @@
 <template>
-  <view>
+  <view class="cartcontrol-wrap">
     <view class="cartcontrol" v-if="food.dishMode === 1">
       <view class="cart-decrease" @tap="decreaseCart">
         <text class="cart-icon cart-inner"
@@ -196,75 +196,67 @@
   };
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus" type="text/stylus">
-  .cartcontrol {
-    .good-format-btn {
-      width: 104rpx;
-      height: 46rpx;
-      line-height: 46rpx;
-      text-align: center;
-      border-radius: 23px;
-      color: $color-button-text;
-      font-size: $font-size20;
-      background-color: $color-background-button;
-    }
-    animation: cartWrapShow .8s ease .8s both;
-    .cart-decrease {
-      display: inline-block;
-      .cart-inner {
+<style lang="stylus" rel="stylesheet/stylus" type="text/stylus" scoped>
+  .cartcontrol-wrap {
+    .cartcontrol {
+      animation: cartWrapShow .8s ease .8s both;
+      .cart-decrease {
+        display: inline-block;
+        .cart-inner {
+          opacity: 0;
+          background: url('../../static/img/reduce-button.png') no-repeat;
+          background-size: cover;
+        }
+        .cart-decrease-show {
+          animation: cartDdecreaseShow 1s ease 0s both;
+        }
+        .cart-decrease-hide {
+          animation: cartDdecreaseHide 1.2s ease 0s both;
+        }
+      }
+      .cart-icon {
+        width: 46rpx;
+        height: 46rpx;
+      }
+      .cart-count {
+        display: inline-block;
+        vertical-align: top;
+        padding: 0 6rpx;
+        line-height: 46rpx;
+        width: 44rpx;
+        text-align: center;
         opacity: 0;
-        background: url('../../static/img/reduce-button.png') no-repeat;
+        font-size: $font-size-large-xxx;
+        color: $color-highlight-background;
+      }
+      .cart-num-show {
+        animation: cartNumShow .5s ease .3s both;
+      }
+      .cart-num-hide {
+        animation: cartNumHide .3s ease 0s both;
+      }
+      .cart-add {
+        position: relative;
+        z-index: 999;
+        display: inline-block;
+        background: url('../../static/img/add-button.png') no-repeat;
         background-size: cover;
       }
-      .cart-decrease-show {
-        animation: cartDdecreaseShow 1s ease 0s both;
-      }
-      .cart-decrease-hide {
-        animation: cartDdecreaseHide 1.2s ease 0s both;
-      }
     }
-    .cart-icon {
-      width: 46rpx;
-      height: 46rpx;
-    }
-    .cart-count {
-      display: inline-block;
-      vertical-align: top;
-      padding: 0 6rpx;
-      line-height: 46rpx;
-      width: 44rpx;
-      text-align: center;
-      opacity: 0;
-      font-size: $font-size-large-xxx;
-      color: $color-highlight-background;
-    }
-    .cart-num-show {
-      animation: cartNumShow .5s ease .3s both;
-    }
-    .cart-num-hide {
-      animation: cartNumHide .3s ease 0s both;
-    }
-    .cart-add {
-      position: relative;
+    .ball-box {
+      width: 32rpx;
+      height: 32rpx;
+      position: fixed;
+      border-radius: 50%;
+      overflow: hidden;
+      left: 50%;
+      top: 50%;
       z-index: 999;
-      display: inline-block;
-      background: url('../../static/img/add-button.png') no-repeat;
-      background-size: cover;
-    }
-  }
-  .ball-box {
-    width: 32rpx;
-    height: 32rpx;
-    position: fixed;
-    border-radius: 50%;
-    overflow: hidden;
-    left: 50%;
-    top: 50%;
-    z-index: 999;
-    .ball-icon {
-      width: 100%;
-      height: 100%;
-      background: $color-background-button;
+      .ball-icon {
+        width: 100%;
+        height: 100%;
+        background: $color-background-button;
+      }
     }
   }
   @-webkit-keyframes cartWrapShow {

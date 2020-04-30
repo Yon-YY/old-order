@@ -209,6 +209,12 @@
         } else {
           this.scrollTop = 0;
         }
+        // if (uni.pageScrollTo) {
+        //   uni.pageScrollTo({
+        //     scrollTop: 0,
+        //     duration: 300
+        //   });
+        // }
       },
       foodsParams() {
         this.loading = false;

@@ -1,11 +1,5 @@
 {
   "pages": [
-//    {
-//      "path": "pages/submit-order/submit-order",
-//      "style": {
-//        "navigationBarTitleText": "提交订单"
-//      }
-//    },
     {
       "path": "pages/login/login",
       "style": {
